@@ -13,8 +13,7 @@ func CreateDB(db *sql.DB) error {
 	return err
 }
 
-func InsertCompanyData(db *sql.DB, companyData CompanyData) error {
-	_, err := db.Exec(`
+const InsertCompanyDataSQL = `
 		INSERT OR REPLACE INTO company_data (
 			company_name,
 			company_number,
@@ -51,42 +50,11 @@ func InsertCompanyData(db *sql.DB, companyData CompanyData) error {
 			uri,
 			conf_stmt_next_due_date,
 			conf_stmt_last_made_up_date
-		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-		companyData.CompanyName,
-		companyData.CompanyNumber,
-		companyData.RegAddressCareOf,
-		companyData.RegAddressPOBox,
-		companyData.RegAddressAddressLine1,
-		companyData.RegAddressAddressLine2,
-		companyData.RegAddressPostTown,
-		companyData.RegAddressCounty,
-		companyData.RegAddressCountry,
-		companyData.RegAddressPostCode,
-		companyData.CompanyCategory,
-		companyData.CompanyStatus,
-		companyData.CountryOfOrigin,
-		companyData.DissolutionDate,
-		companyData.IncorporationDate,
-		companyData.AccountsAccountRefDay,
-		companyData.AccountsAccountRefMonth,
-		companyData.AccountsNextDueDate,
-		companyData.AccountsLastMadeUpDate,
-		companyData.AccountsAccountCategory,
-		companyData.ReturnsNextDueDate,
-		companyData.ReturnsLastMadeUpDate,
-		companyData.MortgagesNumMortCharges,
-		companyData.MortgagesNumMortOutstanding,
-		companyData.MortgagesNumMortPartSatisfied,
-		companyData.MortgagesNumMortSatisfied,
-		companyData.SICCodeSicText_1,
-		companyData.SICCodeSicText_2,
-		companyData.SICCodeSicText_3,
-		companyData.SICCodeSicText_4,
-		companyData.LimitedPartnershipsNumGenPartners,
-		companyData.LimitedPartnershipsNumLimPartners,
-		companyData.URI,
-		companyData.ConfStmtNextDueDate,
-		companyData.ConfStmtLastMadeUpDate,
-	)
-	return err
-}
+		) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+
+const InsertCodePointSQL = `
+		INSERT OR REPLACE INTO code_point (
+			post_code,
+			easting,
+			northing
+		) VALUES (?,?,?)`

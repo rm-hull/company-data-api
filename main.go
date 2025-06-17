@@ -1,7 +1,6 @@
 package main
 
 import (
-	"archive/zip"
 	"companies-house-api/internal"
 	"database/sql"
 	_ "embed"
@@ -12,7 +11,6 @@ import (
 )
 
 func main() {
-
 	dbPath := filepath.Join("data", "companies_house.db")
 
 	db, err := sql.Open("sqlite3", dbPath)
@@ -36,36 +34,13 @@ func main() {
 		log.Fatalf("failed to create database: %v", err)
 	}
 
-	zipPath := filepath.Join("data", "BasicCompanyDataAsOneFile-2025-06-01.zip")
-	r, err := zip.OpenReader(zipPath)
+	err = internal.ImportCodePoint("./data/codepo_gb.zip", db)
 	if err != nil {
-		log.Fatalf("Failed to open zip file: %v", err)
+		log.Fatalf("failed to import code points: %v", err)
 	}
-	defer r.Close()
 
-	for _, f := range r.File {
-		rc, err := f.Open()
-		defer rc.Close()
-		if err != nil {
-			log.Fatalf("Failed to open file in zip: %v", err)
-		}
-
-		for result := range internal.ParseCSV(rc, internal.FromCSV) {
-
-			if result.Error != nil {
-				log.Fatalf("Error parsing line %d: %v", result.LineNum, result.Error)
-			}
-
-			companyData := result.Value
-
-			err := internal.InsertCompanyData(db, companyData)
-			if err != nil {
-				log.Fatalf("failed to insert company data for line %d: %v", result.LineNum, err)
-			}
-
-			if result.LineNum%379 == 0 {
-				log.Printf("Inserted %d records...", result.LineNum)
-			}
-		}
-	}
+	// err = internal.ImportCompanyData("./data/BasicCompanyDataAsOneFile-2025-06-01.zip", db)
+	// if err != nil {
+	// 	log.Fatalf("failed to import company data: %v", err)
+	// }
 }

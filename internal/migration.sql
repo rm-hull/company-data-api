@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS code_point (
+    post_code TEXT NOT NULL PRIMARY KEY,
+    easting NUMERIC NOT NULL,
+    northing NUMERIC NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_code_point_easting_northing
+ON code_point (easting, northing);
+
+
 CREATE TABLE IF NOT EXISTS company_data (
     company_name TEXT NOT NULL,
     company_number TEXT NOT NULL PRIMARY KEY,
@@ -40,3 +50,9 @@ CREATE TABLE IF NOT EXISTS company_data (
     conf_stmt_next_due_date TIMESTAMP,
     conf_stmt_last_made_up_date TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_company_data_reg_address_post_code
+ON company_data (reg_address_post_code);
+
+ANALYZE code_point;
+ANALYZE company_data;

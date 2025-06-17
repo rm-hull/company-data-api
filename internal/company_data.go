@@ -1,8 +1,10 @@
 package internal
 
 import (
+	"archive/zip"
+	"database/sql"
 	"fmt"
-	"strconv"
+	"log"
 	"time"
 )
 
@@ -44,7 +46,7 @@ type CompanyData struct {
 	ConfStmtLastMadeUpDate            *time.Time `json:"conf_stmt_last_made_up_date,omitempty"`
 }
 
-func FromCSV(record []string, headers []string) (CompanyData, error) {
+func fromCompanyDataCSV(record []string, headers []string) (CompanyData, error) {
 	if len(record) < len(headers) {
 		return CompanyData{}, fmt.Errorf("record has fewer fields than headers: %d vs %d", len(record), len(headers))
 	}
@@ -124,23 +126,93 @@ func FromCSV(record []string, headers []string) (CompanyData, error) {
 	return company, nil
 }
 
-func parseDate(dateStr string) (*time.Time, error) {
-	if dateStr == "" {
-		return nil, nil
+func companyDataToTuple(companyData CompanyData) []any {
+	return []any{
+		companyData.CompanyName,
+		companyData.CompanyNumber,
+		companyData.RegAddressCareOf,
+		companyData.RegAddressPOBox,
+		companyData.RegAddressAddressLine1,
+		companyData.RegAddressAddressLine2,
+		companyData.RegAddressPostTown,
+		companyData.RegAddressCounty,
+		companyData.RegAddressCountry,
+		companyData.RegAddressPostCode,
+		companyData.CompanyCategory,
+		companyData.CompanyStatus,
+		companyData.CountryOfOrigin,
+		companyData.DissolutionDate,
+		companyData.IncorporationDate,
+		companyData.AccountsAccountRefDay,
+		companyData.AccountsAccountRefMonth,
+		companyData.AccountsNextDueDate,
+		companyData.AccountsLastMadeUpDate,
+		companyData.AccountsAccountCategory,
+		companyData.ReturnsNextDueDate,
+		companyData.ReturnsLastMadeUpDate,
+		companyData.MortgagesNumMortCharges,
+		companyData.MortgagesNumMortOutstanding,
+		companyData.MortgagesNumMortPartSatisfied,
+		companyData.MortgagesNumMortSatisfied,
+		companyData.SICCodeSicText_1,
+		companyData.SICCodeSicText_2,
+		companyData.SICCodeSicText_3,
+		companyData.SICCodeSicText_4,
+		companyData.LimitedPartnershipsNumGenPartners,
+		companyData.LimitedPartnershipsNumLimPartners,
+		companyData.URI,
+		companyData.ConfStmtNextDueDate,
+		companyData.ConfStmtLastMadeUpDate,
 	}
-
-	layout := "02/01/2006"
-	t, err := time.Parse(layout, dateStr)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse date %q: %w", dateStr, err)
-	}
-	return &t, nil
 }
 
-func parseInt(s string) int {
-	n, err := strconv.Atoi(s)
+func ImportCompanyData(zipPath string, db *sql.DB) error {
+
+	stmt, err := db.Prepare(InsertCompanyDataSQL)
 	if err != nil {
-		return 0
+		return fmt.Errorf("failed to prepare statement: %w", err)
 	}
-	return n
+	defer stmt.Close()
+
+	r, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return fmt.Errorf("failed to open zip file: %w", err)
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+		if err := processCompanyDataCSV(f, stmt); err != nil {
+			return fmt.Errorf("failed to process CSV data: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func processCompanyDataCSV(f *zip.File, stmt *sql.Stmt) error {
+	rc, err := f.Open()
+	defer rc.Close()
+	if err != nil {
+		return fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
+	}
+
+	for result := range parseCSV(rc, true, fromCompanyDataCSV) {
+
+		if result.Error != nil {
+			return fmt.Errorf("error parsing line %d: %w", result.LineNum, result.Error)
+		}
+
+		companyData := result.Value
+
+		_, err := stmt.Exec(companyDataToTuple(companyData)...)
+		if err != nil {
+			return fmt.Errorf("failed to insert company data for line %d: %w", result.LineNum, err)
+		}
+
+		if result.LineNum%379 == 0 {
+			log.Printf("Inserted %d records...", result.LineNum)
+		}
+	}
+
+	return nil
 }

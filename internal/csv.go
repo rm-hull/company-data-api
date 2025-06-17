@@ -13,18 +13,23 @@ type Result[T any] struct {
 	Error   error
 }
 
-func ParseCSV[T any](reader io.Reader, fromFunc func(data []string, headers []string) (T, error)) iter.Seq[Result[T]] {
+func parseCSV[T any](reader io.Reader, includesHeader bool, fromFunc func(data []string, headers []string) (T, error)) iter.Seq[Result[T]] {
 
 	return func(yield func(Result[T]) bool) {
 		lineNum := 0
 		csvReader := csv.NewReader(reader)
-		headers, err := csvReader.Read()
-		if err != nil {
-			yield(Result[T]{
-				LineNum: lineNum,
-				Error:   fmt.Errorf("failed to read CSV headers: %w", err),
-			})
-			return
+		var headers []string
+		var err error
+
+		if includesHeader {
+			headers, err = csvReader.Read()
+			if err != nil {
+				yield(Result[T]{
+					LineNum: lineNum,
+					Error:   fmt.Errorf("failed to read CSV headers: %w", err),
+				})
+				return
+			}
 		}
 
 		for {
