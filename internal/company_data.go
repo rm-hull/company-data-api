@@ -13,8 +13,8 @@ type CompanyData struct {
 	CompanyNumber                     string     `json:"company_number"`
 	RegAddressCareOf                  string     `json:"reg_address_care_of,omitempty"`
 	RegAddressPOBox                   string     `json:"reg_address_po_box,omitempty"`
-	RegAddressAddressLine1            string     `json:"reg_address_address_line1"`
-	RegAddressAddressLine2            string     `json:"reg_address_address_line2,omitempty"`
+	RegAddressAddressLine1            string     `json:"reg_address_address_line_1"`
+	RegAddressAddressLine2            string     `json:"reg_address_address_line_2,omitempty"`
 	RegAddressPostTown                string     `json:"reg_address_post_town"`
 	RegAddressCounty                  string     `json:"reg_address_county,omitempty"`
 	RegAddressCountry                 string     `json:"reg_address_country"`
