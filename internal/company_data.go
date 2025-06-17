@@ -26,11 +26,11 @@ type CompanyData struct {
 	IncorporationDate                 *time.Time `json:"incorporation_date"`
 	AccountsAccountRefDay             int        `json:"accounts_account_ref_day"`
 	AccountsAccountRefMonth           int        `json:"accounts_account_ref_month"`
-	AccountsNextDueDate               *time.Time `json:"accounts_next_due_date"`
-	AccountsLastMadeUpDate            *time.Time `json:"accounts_last_made_up_date"`
+	AccountsNextDueDate               *time.Time `json:"accounts_next_due_date,omitempty"`
+	AccountsLastMadeUpDate            *time.Time `json:"accounts_last_made_up_date,omitempty"`
 	AccountsAccountCategory           string     `json:"accounts_account_category"`
-	ReturnsNextDueDate                *time.Time `json:"returns_next_due_date"`
-	ReturnsLastMadeUpDate             *time.Time `json:"returns_last_made_up_date"`
+	ReturnsNextDueDate                *time.Time `json:"returns_next_due_date,omitempty"`
+	ReturnsLastMadeUpDate             *time.Time `json:"returns_last_made_up_date,omitempty"`
 	MortgagesNumMortCharges           int        `json:"mortgages_num_charges"`
 	MortgagesNumMortOutstanding       int        `json:"mortgages_num_outstanding"`
 	MortgagesNumMortPartSatisfied     int        `json:"mortgages_num_part_satisfied"`
