@@ -31,5 +31,5 @@ go.work.sum
 # .idea/
 # .vscode/
 
-data/companies_house.db
+data/companies_house.db*
 data/BasicCompanyDataAsOneFile-2025-06-01.zip
