@@ -31,14 +31,14 @@ type CompanyData struct {
 	AccountsAccountCategory           string     `json:"accounts_account_category"`
 	ReturnsNextDueDate                *time.Time `json:"returns_next_due_date"`
 	ReturnsLastMadeUpDate             *time.Time `json:"returns_last_made_up_date"`
-	MortgagesNumMortCharges           int        `json:"mortgages_num_mort_charges"`
-	MortgagesNumMortOutstanding       int        `json:"mortgages_num_mort_outstanding"`
-	MortgagesNumMortPartSatisfied     int        `json:"mortgages_num_mort_part_satisfied"`
-	MortgagesNumMortSatisfied         int        `json:"mortgages_num_mort_satisfied"`
-	SICCodeSicText_1                  string     `json:"sic_code_sic_text_1"`
-	SICCodeSicText_2                  string     `json:"sic_code_sic_text_2,omitempty"`
-	SICCodeSicText_3                  string     `json:"sic_code_sic_text_3,omitempty"`
-	SICCodeSicText_4                  string     `json:"sic_code_sic_text_4,omitempty"`
+	MortgagesNumMortCharges           int        `json:"mortgages_num_charges"`
+	MortgagesNumMortOutstanding       int        `json:"mortgages_num_outstanding"`
+	MortgagesNumMortPartSatisfied     int        `json:"mortgages_num_part_satisfied"`
+	MortgagesNumMortSatisfied         int        `json:"mortgages_num_satisfied"`
+	SICCodeSicText_1                  string     `json:"sic_code_1"`
+	SICCodeSicText_2                  string     `json:"sic_code_2,omitempty"`
+	SICCodeSicText_3                  string     `json:"sic_code_3,omitempty"`
+	SICCodeSicText_4                  string     `json:"sic_code_4,omitempty"`
 	LimitedPartnershipsNumGenPartners int        `json:"limited_partnerships_num_gen_partners"`
 	LimitedPartnershipsNumLimPartners int        `json:"limited_partnerships_num_lim_partners"`
 	URI                               string     `json:"uri"`

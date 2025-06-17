@@ -31,6 +31,7 @@ go.work.sum
 # .idea/
 # .vscode/
 
+__debug_bin*
 data/codepo_gb.zip
-data/companies_house.db*
+data/companies_data.db*
 data/BasicCompanyDataAsOneFile-2025-06-01.zip
