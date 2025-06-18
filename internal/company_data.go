@@ -13,8 +13,8 @@ type CompanyData struct {
 	CompanyNumber                     string     `json:"company_number"`
 	RegAddressCareOf                  string     `json:"reg_address_care_of,omitempty"`
 	RegAddressPOBox                   string     `json:"reg_address_po_box,omitempty"`
-	RegAddressAddressLine1            string     `json:"reg_address_address_line1"`
-	RegAddressAddressLine2            string     `json:"reg_address_address_line2,omitempty"`
+	RegAddressAddressLine1            string     `json:"reg_address_address_line_1"`
+	RegAddressAddressLine2            string     `json:"reg_address_address_line_2,omitempty"`
 	RegAddressPostTown                string     `json:"reg_address_post_town"`
 	RegAddressCounty                  string     `json:"reg_address_county,omitempty"`
 	RegAddressCountry                 string     `json:"reg_address_country"`
@@ -26,19 +26,19 @@ type CompanyData struct {
 	IncorporationDate                 *time.Time `json:"incorporation_date"`
 	AccountsAccountRefDay             int        `json:"accounts_account_ref_day"`
 	AccountsAccountRefMonth           int        `json:"accounts_account_ref_month"`
-	AccountsNextDueDate               *time.Time `json:"accounts_next_due_date"`
-	AccountsLastMadeUpDate            *time.Time `json:"accounts_last_made_up_date"`
+	AccountsNextDueDate               *time.Time `json:"accounts_next_due_date,omitempty"`
+	AccountsLastMadeUpDate            *time.Time `json:"accounts_last_made_up_date,omitempty"`
 	AccountsAccountCategory           string     `json:"accounts_account_category"`
-	ReturnsNextDueDate                *time.Time `json:"returns_next_due_date"`
-	ReturnsLastMadeUpDate             *time.Time `json:"returns_last_made_up_date"`
-	MortgagesNumMortCharges           int        `json:"mortgages_num_mort_charges"`
-	MortgagesNumMortOutstanding       int        `json:"mortgages_num_mort_outstanding"`
-	MortgagesNumMortPartSatisfied     int        `json:"mortgages_num_mort_part_satisfied"`
-	MortgagesNumMortSatisfied         int        `json:"mortgages_num_mort_satisfied"`
-	SICCodeSicText_1                  string     `json:"sic_code_sic_text_1"`
-	SICCodeSicText_2                  string     `json:"sic_code_sic_text_2,omitempty"`
-	SICCodeSicText_3                  string     `json:"sic_code_sic_text_3,omitempty"`
-	SICCodeSicText_4                  string     `json:"sic_code_sic_text_4,omitempty"`
+	ReturnsNextDueDate                *time.Time `json:"returns_next_due_date,omitempty"`
+	ReturnsLastMadeUpDate             *time.Time `json:"returns_last_made_up_date,omitempty"`
+	MortgagesNumCharges               int        `json:"mortgages_num_charges"`
+	MortgagesNumOutstanding           int        `json:"mortgages_num_outstanding"`
+	MortgagesNumPartSatisfied         int        `json:"mortgages_num_part_satisfied"`
+	MortgagesNumSatisfied             int        `json:"mortgages_num_satisfied"`
+	SICCode1                          string     `json:"sic_code_1"`
+	SICCode2                          string     `json:"sic_code_2,omitempty"`
+	SICCode3                          string     `json:"sic_code_3,omitempty"`
+	SICCode4                          string     `json:"sic_code_4,omitempty"`
 	LimitedPartnershipsNumGenPartners int        `json:"limited_partnerships_num_gen_partners"`
 	LimitedPartnershipsNumLimPartners int        `json:"limited_partnerships_num_lim_partners"`
 	URI                               string     `json:"uri"`
@@ -108,14 +108,14 @@ func fromCompanyDataCSV(record []string, headers []string) (CompanyData, error) 
 		AccountsAccountCategory:           record[19],
 		ReturnsNextDueDate:                returnsNextDueDate,
 		ReturnsLastMadeUpDate:             returnsLastMadeUpDate,
-		MortgagesNumMortCharges:           parseInt(record[22]),
-		MortgagesNumMortOutstanding:       parseInt(record[23]),
-		MortgagesNumMortPartSatisfied:     parseInt(record[24]),
-		MortgagesNumMortSatisfied:         parseInt(record[25]),
-		SICCodeSicText_1:                  record[26],
-		SICCodeSicText_2:                  record[27],
-		SICCodeSicText_3:                  record[28],
-		SICCodeSicText_4:                  record[29],
+		MortgagesNumCharges:               parseInt(record[22]),
+		MortgagesNumOutstanding:           parseInt(record[23]),
+		MortgagesNumPartSatisfied:         parseInt(record[24]),
+		MortgagesNumSatisfied:             parseInt(record[25]),
+		SICCode1:                          record[26],
+		SICCode2:                          record[27],
+		SICCode3:                          record[28],
+		SICCode4:                          record[29],
 		LimitedPartnershipsNumGenPartners: parseInt(record[30]),
 		LimitedPartnershipsNumLimPartners: parseInt(record[31]),
 		URI:                               record[32],
@@ -150,14 +150,14 @@ func companyDataToTuple(companyData CompanyData) []any {
 		companyData.AccountsAccountCategory,
 		companyData.ReturnsNextDueDate,
 		companyData.ReturnsLastMadeUpDate,
-		companyData.MortgagesNumMortCharges,
-		companyData.MortgagesNumMortOutstanding,
-		companyData.MortgagesNumMortPartSatisfied,
-		companyData.MortgagesNumMortSatisfied,
-		companyData.SICCodeSicText_1,
-		companyData.SICCodeSicText_2,
-		companyData.SICCodeSicText_3,
-		companyData.SICCodeSicText_4,
+		companyData.MortgagesNumCharges,
+		companyData.MortgagesNumOutstanding,
+		companyData.MortgagesNumPartSatisfied,
+		companyData.MortgagesNumSatisfied,
+		companyData.SICCode1,
+		companyData.SICCode2,
+		companyData.SICCode3,
+		companyData.SICCode4,
 		companyData.LimitedPartnershipsNumGenPartners,
 		companyData.LimitedPartnershipsNumLimPartners,
 		companyData.URI,
