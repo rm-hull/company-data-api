@@ -172,13 +172,21 @@ func ImportCompanyData(zipPath string, db *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %w", err)
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Printf("error closing statement: %v", err)
+		}
+	}()
 
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			log.Printf("error closing zip file: %v", err)
+		}
+	}()
 
 	for _, f := range r.File {
 		if err := processCompanyDataCSV(f, stmt); err != nil {
@@ -190,13 +198,17 @@ func ImportCompanyData(zipPath string, db *sql.DB) error {
 }
 
 func processCompanyDataCSV(f *zip.File, stmt *sql.Stmt) error {
-	rc, err := f.Open()
-	defer rc.Close()
+	r, err := f.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
 	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			log.Printf("error closing embedded zip file: %v", err)
+		}
+	}()
 
-	for result := range parseCSV(rc, true, fromCompanyDataCSV) {
+	for result := range parseCSV(r, true, fromCompanyDataCSV) {
 
 		if result.Error != nil {
 			return fmt.Errorf("error parsing line %d: %w", result.LineNum, result.Error)
