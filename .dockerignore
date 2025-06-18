@@ -2,6 +2,7 @@
 .vscode
 data/companies_data.db*
 data/BasicCompanyDataAsOneFile-2025-06-01.zip
+data/codepo_gb.zip
 LICENSE.md
 README.md
 ATTRIBUTION.md

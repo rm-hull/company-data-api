@@ -16,7 +16,7 @@ COPY . .
 ENV CGO_ENABLED=1
 ENV GOOS=linux
 
-RUN go build -ldflags="-w -s" -o poi .
+RUN go build -ldflags="-w -s" -o company-data .
 
 FROM alpine:latest AS runtime
 ENV GIN_MODE=release
@@ -28,8 +28,7 @@ RUN apk --no-cache add curl ca-certificates tzdata && \
 RUN adduser -D -g '' appuser
 WORKDIR /app
 
-COPY ./data/markers /app/data/markers
-COPY --from=build /app/poi .
+COPY --from=build /app/company-data .
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
 
@@ -39,4 +38,4 @@ EXPOSE 8080/tcp
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/healthz || exit 1
 
-ENTRYPOINT ["./poi"]
+ENTRYPOINT ["./company-data"]
