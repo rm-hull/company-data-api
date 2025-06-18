@@ -39,13 +39,21 @@ func ImportCodePoint(zipPath string, db *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %w", err)
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Printf("error closing statement: %v", err)
+		}
+	}()
 
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)
 	}
-	defer r.Close()
+	defer func() {
+		if err := r.Close(); err != nil {
+			log.Printf("error closing zip file: %v", err)
+		}
+	}()
 
 	for _, f := range r.File {
 		if f.FileInfo().IsDir() || !strings.HasPrefix(f.Name, "Data/CSV/") {
@@ -61,13 +69,17 @@ func ImportCodePoint(zipPath string, db *sql.DB) error {
 }
 
 func processCodePointCSV(f *zip.File, stmt *sql.Stmt) error {
-	rc, err := f.Open()
-	defer rc.Close()
+	r, err := f.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
 	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			log.Printf("error closing embedded zip file: %v", err)
+		}
+	}()
 
-	for result := range parseCSV(rc, false, fromCodePointCSV) {
+	for result := range parseCSV(r, false, fromCodePointCSV) {
 		if result.Error != nil {
 			return fmt.Errorf("error parsing line %d: %w", result.LineNum, result.Error)
 		}
