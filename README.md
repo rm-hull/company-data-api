@@ -1,4 +1,4 @@
-# Companies Data API
+# Company Data API
 
 ## Preparation
 
