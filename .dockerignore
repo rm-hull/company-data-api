@@ -1,0 +1,9 @@
+.github
+.vscode
+data/companies_house.db*
+data/BasicCompanyDataAsOneFile-2025-06-01.zip
+LICENSE.md
+README.md
+ATTRIBUTION.md
+.env*
+docker-compose.yml
