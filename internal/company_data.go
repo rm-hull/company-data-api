@@ -2,90 +2,52 @@ package internal
 
 import (
 	"archive/zip"
+	"company-data-api/models"
 	"database/sql"
 	"fmt"
 	"log"
-	"time"
 )
 
-type CompanyData struct {
-	CompanyName                       string     `json:"company_name"`
-	CompanyNumber                     string     `json:"company_number"`
-	RegAddressCareOf                  string     `json:"reg_address_care_of,omitempty"`
-	RegAddressPOBox                   string     `json:"reg_address_po_box,omitempty"`
-	RegAddressAddressLine1            string     `json:"reg_address_address_line_1"`
-	RegAddressAddressLine2            string     `json:"reg_address_address_line_2,omitempty"`
-	RegAddressPostTown                string     `json:"reg_address_post_town"`
-	RegAddressCounty                  string     `json:"reg_address_county,omitempty"`
-	RegAddressCountry                 string     `json:"reg_address_country"`
-	RegAddressPostCode                string     `json:"reg_address_post_code"`
-	CompanyCategory                   string     `json:"company_category"`
-	CompanyStatus                     string     `json:"company_status"`
-	CountryOfOrigin                   string     `json:"country_of_origin"`
-	DissolutionDate                   *time.Time `json:"dissolution_date,omitempty"`
-	IncorporationDate                 *time.Time `json:"incorporation_date"`
-	AccountsAccountRefDay             int        `json:"accounts_account_ref_day"`
-	AccountsAccountRefMonth           int        `json:"accounts_account_ref_month"`
-	AccountsNextDueDate               *time.Time `json:"accounts_next_due_date,omitempty"`
-	AccountsLastMadeUpDate            *time.Time `json:"accounts_last_made_up_date,omitempty"`
-	AccountsAccountCategory           string     `json:"accounts_account_category"`
-	ReturnsNextDueDate                *time.Time `json:"returns_next_due_date,omitempty"`
-	ReturnsLastMadeUpDate             *time.Time `json:"returns_last_made_up_date,omitempty"`
-	MortgagesNumCharges               int        `json:"mortgages_num_charges"`
-	MortgagesNumOutstanding           int        `json:"mortgages_num_outstanding"`
-	MortgagesNumPartSatisfied         int        `json:"mortgages_num_part_satisfied"`
-	MortgagesNumSatisfied             int        `json:"mortgages_num_satisfied"`
-	SICCode1                          string     `json:"sic_code_1"`
-	SICCode2                          string     `json:"sic_code_2,omitempty"`
-	SICCode3                          string     `json:"sic_code_3,omitempty"`
-	SICCode4                          string     `json:"sic_code_4,omitempty"`
-	LimitedPartnershipsNumGenPartners int        `json:"limited_partnerships_num_gen_partners"`
-	LimitedPartnershipsNumLimPartners int        `json:"limited_partnerships_num_lim_partners"`
-	URI                               string     `json:"uri"`
-	ConfStmtNextDueDate               *time.Time `json:"conf_stmt_next_due_date,omitempty"`
-	ConfStmtLastMadeUpDate            *time.Time `json:"conf_stmt_last_made_up_date,omitempty"`
-}
-
-func fromCompanyDataCSV(record []string, headers []string) (CompanyData, error) {
+func fromCompanyDataCSV(record []string, headers []string) (models.CompanyData, error) {
 	if len(record) < len(headers) {
-		return CompanyData{}, fmt.Errorf("record has fewer fields than headers: %d vs %d", len(record), len(headers))
+		return models.CompanyData{}, fmt.Errorf("record has fewer fields than headers: %d vs %d", len(record), len(headers))
 	}
 
 	dissolutionDate, err := parseDate(record[13])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid DissolutionDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid DissolutionDate: %w", err)
 	}
 	incorporationDate, err := parseDate(record[14])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid IncorporationDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid IncorporationDate: %w", err)
 	}
 	confStmtNextDueDate, err := parseDate(record[53])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid ConfStmtNextDueDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid ConfStmtNextDueDate: %w", err)
 	}
 	confStmtLastMadeUpDate, err := parseDate(record[54])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid ConfStmtLastMadeUpDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid ConfStmtLastMadeUpDate: %w", err)
 	}
 
 	accountsNextDueDate, err := parseDate(record[17])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid AccountsNextDueDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid AccountsNextDueDate: %w", err)
 	}
 	accountsLastMadeUpDate, err := parseDate(record[18])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid AccountsLastMadeUpDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid AccountsLastMadeUpDate: %w", err)
 	}
 	returnsNextDueDate, err := parseDate(record[20])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid ReturnsNextDueDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid ReturnsNextDueDate: %w", err)
 	}
 	returnsLastMadeUpDate, err := parseDate(record[21])
 	if err != nil {
-		return CompanyData{}, fmt.Errorf("invalid ReturnsLastMadeUpDate: %w", err)
+		return models.CompanyData{}, fmt.Errorf("invalid ReturnsLastMadeUpDate: %w", err)
 	}
 
-	company := CompanyData{
+	company := models.CompanyData{
 		CompanyName:                       record[0],
 		CompanyNumber:                     record[1],
 		RegAddressCareOf:                  record[2],
@@ -126,7 +88,7 @@ func fromCompanyDataCSV(record []string, headers []string) (CompanyData, error) 
 	return company, nil
 }
 
-func companyDataToTuple(companyData CompanyData) []any {
+func companyDataToTuple(companyData models.CompanyData) []any {
 	return []any{
 		companyData.CompanyName,
 		companyData.CompanyNumber,
