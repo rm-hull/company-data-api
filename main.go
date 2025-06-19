@@ -2,6 +2,7 @@ package main
 
 import (
 	"company-data-api/internal"
+	"company-data-api/repositories"
 	"database/sql"
 	_ "embed"
 	"fmt"
@@ -60,6 +61,10 @@ func server(dbPath string, port int) {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	log.Printf("connected to database: %s\n", dbPath)
+	repo, err := repositories.NewSqliteDbRepository(db)
+	if err != nil {
+		log.Fatalf("failed to initialize repository: %v", err)
+	}
 
 	r := gin.New()
 	r.Use(
@@ -77,7 +82,7 @@ func server(dbPath string, port int) {
 		log.Fatalf("failed to initialize healthcheck: %v", err)
 	}
 
-	r.GET("/v1/company-data/search", internal.Search(db))
+	r.GET("/v1/company-data/search", internal.Search(repo))
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)
