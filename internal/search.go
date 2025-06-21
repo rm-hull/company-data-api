@@ -5,6 +5,7 @@ import (
 	repo "company-data-api/repositories"
 	"fmt"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,6 +22,8 @@ type GroupedSearchResponse struct {
 	Results     map[string][]models.CompanyDataWithLocation `json:"results"`
 	Attribution []string                                    `json:"attribution"`
 }
+
+const MAX_BOUNDS = 5000 // Maximum bounds in meters (5 KM)
 
 func Search(repo repo.SearchRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
@@ -91,6 +94,10 @@ func parseBBox(bboxStr string) ([]float64, error) {
 			return nil, fmt.Errorf("invalid bbox value '%s': not a valid float", part)
 		}
 		bbox[i] = val
+	}
+
+	if math.Abs(bbox[2]-bbox[0]) > MAX_BOUNDS || math.Abs(bbox[3]-bbox[1]) > MAX_BOUNDS {
+		return nil, fmt.Errorf("bbox must define a valid area (no more than %d KM in either dimension)", MAX_BOUNDS/1000)
 	}
 
 	return bbox, nil
