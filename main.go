@@ -83,6 +83,7 @@ func server(dbPath string, port int) {
 	}
 
 	r.GET("/v1/company-data/search", internal.Search(repo))
+	r.GET("/v1/company-data/search/by-postcode", internal.GroupByPostcode(repo))
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)
