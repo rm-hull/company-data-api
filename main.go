@@ -74,6 +74,7 @@ func server(dbPath string, port int) {
 		ginprom.Namespace("company_data"),
 		ginprom.Subsystem("api"),
 		ginprom.Path("/metrics"),
+		ginprom.Ignore("/healthz"),
 	)
 
 	r.Use(
