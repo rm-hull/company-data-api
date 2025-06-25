@@ -16,7 +16,7 @@ COPY . .
 ENV CGO_ENABLED=1
 ENV GOOS=linux
 
-RUN go build -ldflags="-w -s" -o company-data .
+RUN go build -tags=jsoniter -ldflags="-w -s" -o company-data .
 
 FROM alpine:latest AS runtime
 ENV GIN_MODE=release
