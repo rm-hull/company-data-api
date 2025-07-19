@@ -57,6 +57,12 @@ GET /healthz
 GET /metrics
 ```
 
+#### Swagger/OpenAPI documentation:
+
+```http
+GET /swagger/index.html
+```
+
 ## Architecture Overview
 
 ```mermaid
@@ -103,7 +109,13 @@ flowchart TD
 -   Download CodePoint Open from [OS Data Hub](https://osdatahub.os.uk/downloads/open/CodePointOpen)
 -   Place both `.zip` files in the `./data` directory (do **not** decompress).
 
-### 2. Build and Run
+### 2. Regenerate Swagger definitions
+
+```sh
+swag init
+```
+
+### 3. Build and Run
 
 ```sh
 go build -tags=jsoniter -o company-data .

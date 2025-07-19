@@ -15,10 +15,15 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	healthcheck "github.com/tavsec/gin-healthcheck"
 	"github.com/tavsec/gin-healthcheck/checks"
 	hc_config "github.com/tavsec/gin-healthcheck/config"
 	cachecontrol "go.eigsys.de/gin-cachecontrol/v2"
+
+	swaggerFiles "github.com/swaggo/files"
+
+	docs "company-data-api/docs"
 )
 
 func main() {
@@ -91,8 +96,11 @@ func server(dbPath string, port int) {
 		log.Fatalf("failed to initialize healthcheck: %v", err)
 	}
 
-	r.GET("/v1/company-data/search", internal.Search(repo))
-	r.GET("/v1/company-data/search/by-postcode", internal.GroupByPostcode(repo))
+	docs.SwaggerInfo.BasePath = "/v1/company-data"
+	v1 := r.Group("/v1/company-data")
+	v1.GET("/search", internal.Search(repo))
+	v1.GET("/search/by-postcode", internal.GroupByPostcode(repo))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)

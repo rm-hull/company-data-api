@@ -25,6 +25,18 @@ type GroupedSearchResponse struct {
 
 const MAX_BOUNDS = 5000 // Maximum bounds in meters (5 KM)
 
+// @BasePath /v1/company-data/
+
+// Search godoc
+// @Summary Search companies within bounding box
+// @Description Returns companies within the specified bounding box
+// @Tags search
+// @Param bbox query string true "Bounding box as comma-separated values: minLon,minLat,maxLon,maxLat"
+// @Produce json
+// @Success 200 {object} SearchResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /search [get]
 func Search(repo repo.SearchRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		bbox, err := parseBBox(c.Query("bbox"))
@@ -51,6 +63,16 @@ func Search(repo repo.SearchRepository) func(c *gin.Context) {
 	}
 }
 
+// GroupByPostcode godoc
+// @Summary Group companies by postcode within bounding box
+// @Description Returns companies grouped by postcode within the specified bounding box
+// @Tags search
+// @Param bbox query string true "Bounding box as comma-separated values: minLon,minLat,maxLon,maxLat"
+// @Produce json
+// @Success 200 {object} GroupedSearchResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /search/by-postcode [get]
 func GroupByPostcode(repo repo.SearchRepository) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		bbox, err := parseBBox(c.Query("bbox"))
