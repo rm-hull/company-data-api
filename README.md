@@ -10,16 +10,51 @@ A fast REST API for querying UK company data by geographic bounding box, built w
 GET /v1/company-data/search?bbox=425000,450000,435000,460000
 ```
 
+Example JSON response (see [./models/company_data.go](./models/company_data.go) for the exact schema):
+
+```json
+{
+    "results": [
+        {
+            "company_number": "12345678",
+            "company_name": "ACME WIDGETS LIMITED",
+            "reg_address_post_code": "AB12 3CD",
+            "easting": 426000,
+            "northing": 451000
+        },
+        {
+            "company_number": "87654321",
+            "company_name": "BETA SERVICES LLP",
+            "reg_address_post_code": "AB12 3CD",
+            "easting": 427500,
+            "northing": 452500
+        }
+    ],
+    "attribution": [
+        "Basic Company Data (UK Gov, Companies House), https://download.companieshouse.gov.uk/en_output",
+        "CodePoint Open (UK Gov, OS Data Hub), https://osdatahub.os.uk/downloads/open/CodePointOpen"
+    ]
+}
+```
+
 #### Group companies by postcode within a bounding box:
 
 ```http
 GET /v1/company-data/search/by-postcode?bbox=425000,450000,435000,460000
 ```
 
+The JSON response is similar to previously, but results are grouped by postcode.
+
 #### Health check:
 
 ```http
 GET /healthz
+```
+
+#### Prometheus metrics:
+
+```http
+GET /metrics
 ```
 
 ## Architecture Overview
