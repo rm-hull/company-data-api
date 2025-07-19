@@ -105,7 +105,7 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 
 ## Attribution
 
--   Basic Company Data (UK Gov, Companies House): https://download.companieshouse.gov.uk/en_output
+-   Basic Company Data (UK Gov, Companies House): https://download.companieshouse.gov.uk/en_output.html
 -   CodePoint Open (UK Gov, OS Data Hub): https://osdatahub.os.uk/downloads/open/CodePointOpen
 
 ## TODO & Future Enhancements
