@@ -10,7 +10,7 @@ A fast REST API for querying UK company data by geographic bounding box, built w
 GET /v1/company-data/search?bbox=425000,450000,435000,460000
 ```
 
-Example JSON response (see [./models/company_data.go](./models/company_data.go) for the exact schema):
+Example JSON response (see [models/company_data.go](./models/company_data.go) for the exact schema):
 
 ```json
 {
@@ -149,6 +149,7 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 | `/v1/company-data/search/by-postcode?bbox=...` | Group companies by postcode in a bounding box |
 | `/healthz`                                     | Health check                                  |
 | `/metrics`                                     | Prometheus metrics                            |
+| `/swagger/doc.json`                            | OpenAPI definition                            |
 
 ## Attribution
 
@@ -162,7 +163,7 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 -   [ ] Pagination and filtering options
 -   [ ] Docker Compose for easier setup
 -   [ ] Automated data refresh/import
--   [ ] OpenAPI/Swagger documentation
+-   [X] OpenAPI/Swagger documentation
 -   [ ] More robust error handling and logging
 -   [ ] Unit and integration tests for import and API layers
 
