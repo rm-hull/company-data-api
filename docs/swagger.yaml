@@ -1,3 +1,4 @@
+basePath: /v1/company-data
 definitions:
   internal.GroupedSearchResponse:
     properties:
@@ -102,6 +103,12 @@ definitions:
     type: object
 info:
   contact: {}
+  description: A fast REST API for querying UK company data by geographic bounding
+    box, built with Go, SQLite, and Gin. It imports official datasets from Companies
+    House and Ordnance Survey CodePoint Open, providing spatial search capabilities
+    for company records.
+  title: Company Data API
+  version: "1.0"
 paths:
   /search:
     get:
