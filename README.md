@@ -86,7 +86,7 @@ docker build -t company-data-api .
 Run the container (mount your data directory):
 
 ```sh
-docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api
+docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 ```
 
 -   The binary is built with the `jsoniter` tag for fast JSON serialization.
