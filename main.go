@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "company-data-api/docs"
 	"company-data-api/internal"
 	"company-data-api/repositories"
 	"database/sql"
@@ -15,6 +16,8 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	healthcheck "github.com/tavsec/gin-healthcheck"
 	"github.com/tavsec/gin-healthcheck/checks"
 	hc_config "github.com/tavsec/gin-healthcheck/config"
@@ -42,6 +45,10 @@ func main() {
 	}
 }
 
+// @title Company Data API
+// @version 1.0
+// @description A fast REST API for querying UK company data by geographic bounding box, built with Go, SQLite, and Gin. It imports official datasets from Companies House and Ordnance Survey CodePoint Open, providing spatial search capabilities for company records.
+// @BasePath /v1/company-data
 func server(dbPath string, port int) {
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
 		log.Fatalf("database file does not exist: %s", dbPath)
@@ -91,8 +98,10 @@ func server(dbPath string, port int) {
 		log.Fatalf("failed to initialize healthcheck: %v", err)
 	}
 
-	r.GET("/v1/company-data/search", internal.Search(repo))
-	r.GET("/v1/company-data/search/by-postcode", internal.GroupByPostcode(repo))
+	v1 := r.Group("/v1/company-data")
+	v1.GET("/search", internal.Search(repo))
+	v1.GET("/search/by-postcode", internal.GroupByPostcode(repo))
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)
