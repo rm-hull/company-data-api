@@ -33,7 +33,7 @@ func main() {
 		Use:   "import [--zip-file <path>] [--db <path>]",
 		Short: "Import Companies House ZIP file",
 		Run: func(_ *cobra.Command, _ []string) {
-			cmd.ImportCompaniesHouseZipFile(companiesHouseZipFile)
+			cmd.ImportCompaniesHouseZipFile(companiesHouseZipFile, dbPath)
 		},
 	}
 	processCompaniesHouseZipCmd.Flags().StringVar(&companiesHouseZipFile, "zip-file", "./data/BasicCompanyDataAsOneFile-2025-07-01.zip", "Path to Companies House .zip file")

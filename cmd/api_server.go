@@ -47,7 +47,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 	if err = db.Ping(); err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	log.Printf("connected to database: %s\n", dbPath)
+	log.Printf("connected to database: %s", dbPath)
 	repo, err := repositories.NewSqliteDbRepository(db)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)

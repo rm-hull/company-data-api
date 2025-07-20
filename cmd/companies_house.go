@@ -4,12 +4,9 @@ import (
 	"company-data-api/internal"
 	"database/sql"
 	"log"
-	"path/filepath"
 )
 
-func ImportCompaniesHouseZipFile(path string) {
-	dbPath := filepath.Join("data", "companies_data.db")
-
+func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatalf("failed to open database: %v", err)
@@ -36,7 +33,7 @@ func ImportCompaniesHouseZipFile(path string) {
 	// 	log.Fatalf("failed to import code points: %v", err)
 	// }
 
-	err = internal.ImportCompanyData(path, db)
+	err = internal.ImportCompanyData(zipFile, db)
 	if err != nil {
 		log.Fatalf("failed to import company data: %v", err)
 	}
