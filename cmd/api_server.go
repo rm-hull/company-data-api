@@ -4,6 +4,7 @@ import (
 	_ "company-data-api/docs"
 	"company-data-api/internal"
 	"company-data-api/repositories"
+	"time"
 
 	"database/sql"
 	"fmt"
@@ -66,7 +67,12 @@ func ApiServer(dbPath string, port int, debug bool) {
 		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
 		prometheus.Instrument(),
 		compress.Compress(),
-		cachecontrol.New(cachecontrol.CacheAssetsForeverPreset),
+		cachecontrol.New(cachecontrol.Config{
+			// Set the max-age to 28 days: Companies House data is generally updated monthly
+			MaxAge:    cachecontrol.Duration(28 * 24 * time.Hour),
+			Immutable: true,
+			Public:    true,
+		}),
 		cors.Default(),
 	)
 
