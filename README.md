@@ -201,7 +201,7 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 -   [ ] Pagination and filtering options
 -   [ ] Docker Compose for easier setup
 -   [ ] Automated data refresh/import
--   [x] OpenAPI/Swagger documentation (auto-generated from code)
+-   [X] OpenAPI/Swagger documentation (auto-generated from code)
 -   [ ] More robust error handling and logging
 -   [ ] Unit and integration tests for import and API layers
 

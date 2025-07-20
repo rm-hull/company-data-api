@@ -13,6 +13,7 @@ import (
 	"github.com/Depado/ginprom"
 	"github.com/aurowora/compress"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
 	swaggerFiles "github.com/swaggo/files"
@@ -68,6 +69,11 @@ func ApiServer(dbPath string, port int, debug bool) {
 		cachecontrol.New(cachecontrol.CacheAssetsForeverPreset),
 		cors.Default(),
 	)
+
+	if debug {
+		log.Println("WARNING: pprof endpoints are enabled and exposed. Do not run with this flag in production.")
+		pprof.Register(r)
+	}
 
 	err = healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{
 		checks.SqlCheck{Sql: db},
