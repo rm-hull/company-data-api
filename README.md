@@ -63,14 +63,25 @@ GET /metrics
 GET /swagger/index.html
 ```
 
+OpenAPI documentation is auto-generated from annotated Go handler functions using [swaggo/swag](https://github.com/swaggo/swag). See `internal/search.go` for endpoint annotations.
+
 ## Architecture Overview
 
 ```mermaid
 flowchart TD
+    subgraph CLI
+        X[company-data]
+        X1[api-server]
+        X2[import]
+        X --> X1
+        X --> X2
+    end
+
     subgraph Data Import
         A[Zip Files: Companies House, CodePoint Open]
         B[Import Scripts]
         C[SQLite DB]
+        X2 --> B
         A --> B --> C
     end
 
@@ -79,6 +90,7 @@ flowchart TD
         E[internal/search.go]
         F[repositories/search.go]
         G[models/company_data.go]
+        X1 --> D
         C --> F
         F --> E
         E --> D
@@ -103,6 +115,28 @@ flowchart TD
 
 ## Getting Started Locally
 
+### CLI Commands
+
+The application uses [cobra](https://github.com/spf13/cobra) for its command-line interface. The main commands are:
+
+-   `api-server` — Starts the HTTP API server.
+
+    -   Options:
+        -   `--db <path>`: Path to Companies data SQLite database (default: `./data/companies_data.db`)
+        -   `--port <port>`: Port to run HTTP server on (default: `8080`)
+        -   `--debug`: Enable debugging (pprof). **Warning:** Do not enable in production.
+
+-   `import` — Imports Companies House ZIP file into the database.
+    -   Options:
+        -   `--zip-file <path>`: Path to Companies House .zip file (default: `./data/BasicCompanyDataAsOneFile-2025-07-01.zip`)
+
+Example usage:
+
+```sh
+./company-data api-server --db ./data/companies_data.db --port 8080
+./company-data import --zip-file ./data/BasicCompanyDataAsOneFile-2025-07-01.zip
+```
+
 ### 1. Download Data
 
 -   Download company data from [Companies House](https://download.companieshouse.gov.uk/en_output.html)
@@ -111,7 +145,10 @@ flowchart TD
 
 ### 2. Regenerate Swagger definitions
 
+Swagger/OpenAPI docs are generated from code comments. To update the docs after changing endpoints or annotations:
+
 ```sh
+go install github.com/swaggo/swag/cmd/swag@latest
 swag init
 ```
 
@@ -119,7 +156,7 @@ swag init
 
 ```sh
 go build -tags=jsoniter -o company-data .
-./company-data http --db ./data/companies_data.db --port 8080
+./company-data api-server --db ./data/companies_data.db --port 8080
 ```
 
 ## Using Docker
@@ -149,7 +186,8 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 | `/v1/company-data/search/by-postcode?bbox=...` | Group companies by postcode in a bounding box |
 | `/healthz`                                     | Health check                                  |
 | `/metrics`                                     | Prometheus metrics                            |
-| `/swagger/doc.json`                            | OpenAPI definition                            |
+| `/swagger/index.html`                          | Swagger UI (OpenAPI documentation)            |
+| `/swagger/doc.json`                            | OpenAPI definition (JSON)                     |
 
 ## Attribution
 
@@ -163,7 +201,7 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 -   [ ] Pagination and filtering options
 -   [ ] Docker Compose for easier setup
 -   [ ] Automated data refresh/import
--   [X] OpenAPI/Swagger documentation
+-   [x] OpenAPI/Swagger documentation (auto-generated from code)
 -   [ ] More robust error handling and logging
 -   [ ] Unit and integration tests for import and API layers
 
