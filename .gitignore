@@ -32,6 +32,7 @@ go.work.sum
 # .vscode/
 
 __debug_bin*
+company-data*
 data/codepo_gb.zip
 data/companies_data.db*
 data/BasicCompanyDataAsOneFile-2025-06-01.zip
