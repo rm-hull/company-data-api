@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,11 +17,13 @@ import (
 type SearchResponse struct {
 	Results     []models.CompanyDataWithLocation `json:"results"`
 	Attribution []string                         `json:"attribution"`
+	LastUpdated *time.Time                       `json:"last_updated,omitempty"`
 }
 
 type GroupedSearchResponse struct {
 	Results     map[string][]models.CompanyDataWithLocation `json:"results"`
 	Attribution []string                                    `json:"attribution"`
+	LastUpdated *time.Time                                  `json:"last_updated,omitempty"`
 }
 
 const MAX_BOUNDS = 5000 // Maximum bounds in meters (5 KM)
@@ -59,6 +62,7 @@ func Search(repo repo.SearchRepository) func(c *gin.Context) {
 		c.JSON(http.StatusOK, SearchResponse{
 			Results:     results,
 			Attribution: ATTRIBUTION,
+			LastUpdated: repo.LastUpdated(),
 		})
 	}
 }
@@ -99,6 +103,7 @@ func GroupByPostcode(repo repo.SearchRepository) func(c *gin.Context) {
 		c.JSON(http.StatusOK, GroupedSearchResponse{
 			Results:     results,
 			Attribution: ATTRIBUTION,
+			LastUpdated: repo.LastUpdated(),
 		})
 	}
 }
