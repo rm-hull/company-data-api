@@ -142,17 +142,21 @@ func (repo *SqliteDbRepository) LastUpdated() *time.Time {
 }
 
 func getLastUpdated(db *sql.DB) (*time.Time, error) {
-	var lastUpdateStr string
+	var lastUpdateStr sql.NullString
 	row := db.QueryRow(`SELECT MAX(incorporation_date) FROM company_data`)
-	err := row.Scan(&lastUpdateStr)
-	if err != nil && err != sql.ErrNoRows {
+	if err := row.Scan(&lastUpdateStr); err != nil {
 		return nil, fmt.Errorf("failed to determine last update: %w", err)
 	}
 
-	rfc3339str := strings.Replace(lastUpdateStr, " ", "T", 1)
+	if !lastUpdateStr.Valid {
+		// Table is empty or all incorporation_date values are NULL.
+		return nil, nil
+	}
+
+	rfc3339str := strings.Replace(lastUpdateStr.String, " ", "T", 1)
 	lastUpdate, err := time.Parse(time.RFC3339, rfc3339str)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse last update: %w", err)
+		return nil, fmt.Errorf("failed to parse last update string '%s': %w", lastUpdateStr.String, err)
 	}
 
 	return &lastUpdate, nil
