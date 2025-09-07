@@ -5,7 +5,6 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
-	"os"
 )
 
 //go:embed migration.sql
@@ -63,13 +62,9 @@ const InsertCodePointSQL = `
 		) VALUES (?,?,?)`
 
 func Connect(dbPath string) (*sql.DB, error) {
-	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
-		return nil, fmt.Errorf("database file '%s' does not exist: %w: ", dbPath, err)
-	}
-
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open database: %w: ", err)
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	if err = db.Ping(); err != nil {
@@ -77,5 +72,9 @@ func Connect(dbPath string) (*sql.DB, error) {
 	}
 	log.Printf("connected to database: %s", dbPath)
 
+	err = CreateDB(db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create database: %w", err)
+	}
 	return db, nil
 }
