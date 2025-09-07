@@ -33,7 +33,8 @@ Example JSON response (see [models/company_data.go](./models/company_data.go) fo
     "attribution": [
         "Basic Company Data (UK Gov, Companies House), https://download.companieshouse.gov.uk/en_output",
         "CodePoint Open (UK Gov, OS Data Hub), https://osdatahub.os.uk/downloads/open/CodePointOpen"
-    ]
+    ],
+    "last_updated": "2025-06-30T00:00:00Z"
 }
 ```
 

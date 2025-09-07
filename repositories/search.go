@@ -4,6 +4,8 @@ import (
 	"company-data-api/models"
 	"database/sql"
 	"fmt"
+	"strings"
+	"time"
 )
 
 const (
@@ -15,18 +17,26 @@ const (
 
 type SearchRepository interface {
 	Find(bbox []float64, processRow func(cd *models.CompanyDataWithLocation)) error
+	LastUpdated() *time.Time
 }
 
 type SqliteDbRepository struct {
-	findStmt *sql.Stmt
+	findStmt    *sql.Stmt
+	lastUpdated *time.Time
 }
 
-func NewSqliteDbRepository(db *sql.DB) (*SqliteDbRepository, error) {
+func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
 	findStmt, err := prepareStatement(db)
 	if err != nil {
 		return nil, fmt.Errorf("error preparing statement: %w", err)
 	}
-	return &SqliteDbRepository{findStmt: findStmt}, nil
+
+	lastUpdated, err := getLastUpdated(db)
+	if err != nil {
+		return nil, fmt.Errorf("error querying server: %w", err)
+	}
+
+	return &SqliteDbRepository{findStmt: findStmt, lastUpdated: lastUpdated}, nil
 }
 
 func prepareStatement(db *sql.DB) (*sql.Stmt, error) {
@@ -125,4 +135,25 @@ func (repo *SqliteDbRepository) Find(bbox []float64, rowProcessor func(companyDa
 	}
 
 	return nil
+}
+
+func (repo *SqliteDbRepository) LastUpdated() *time.Time {
+	return repo.lastUpdated
+}
+
+func getLastUpdated(db *sql.DB) (*time.Time, error) {
+	var lastUpdateStr string
+	row := db.QueryRow(`SELECT MAX(incorporation_date) FROM company_data`)
+	err := row.Scan(&lastUpdateStr)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, fmt.Errorf("failed to determine last update: %w", err)
+	}
+
+	rfc3339str := strings.Replace(lastUpdateStr, " ", "T", 1)
+	lastUpdate, err := time.Parse(time.RFC3339, rfc3339str)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse last update: %w", err)
+	}
+
+	return &lastUpdate, nil
 }

@@ -1,0 +1,6 @@
+### Fetch list
+GET http://localhost:8080/v1/company-data/search?bbox=435881,335242,436592,335864
+
+
+### Group by postcode
+GET http://localhost:8080/v1/company-data/search/by-postcode?bbox=435881,335242,436592,335864
