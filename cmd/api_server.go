@@ -6,10 +6,8 @@ import (
 	"company-data-api/repositories"
 	"time"
 
-	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/Depado/ginprom"
 	"github.com/aurowora/compress"
@@ -30,25 +28,17 @@ import (
 // @description A fast REST API for querying UK company data by geographic bounding box, built with Go, SQLite, and Gin. It imports official datasets from Companies House and Ordnance Survey CodePoint Open, providing spatial search capabilities for company records.
 // @BasePath /v1/company-data
 func ApiServer(dbPath string, port int, debug bool) {
-	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
-		log.Fatalf("database file does not exist: %s", dbPath)
-	}
 
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := internal.Connect(dbPath)
 	if err != nil {
-		log.Fatalf("failed to open database: %v", err)
+		log.Fatalf("failed to initialize database: %v", err)
 	}
-
 	defer func() {
 		if err := db.Close(); err != nil {
 			log.Printf("error closing database: %v", err)
 		}
 	}()
 
-	if err = db.Ping(); err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
-	}
-	log.Printf("connected to database: %s", dbPath)
 	repo, err := repositories.NewSqliteDbRepository(db)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)

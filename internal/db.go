@@ -3,6 +3,8 @@ package internal
 import (
 	"database/sql"
 	_ "embed"
+	"fmt"
+	"log"
 )
 
 //go:embed migration.sql
@@ -58,3 +60,21 @@ const InsertCodePointSQL = `
 			easting,
 			northing
 		) VALUES (?,?,?)`
+
+func Connect(dbPath string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database: %w", err)
+	}
+
+	if err = db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
+	}
+	log.Printf("connected to database: %s", dbPath)
+
+	err = CreateDB(db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create database: %w", err)
+	}
+	return db, nil
+}

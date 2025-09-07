@@ -121,21 +121,25 @@ flowchart TD
 The application uses [cobra](https://github.com/spf13/cobra) for its command-line interface. The main commands are:
 
 -   `api-server` — Starts the HTTP API server.
-
     -   Options:
         -   `--db <path>`: Path to Companies data SQLite database (default: `./data/companies_data.db`)
         -   `--port <port>`: Port to run HTTP server on (default: `8080`)
         -   `--debug`: Enable debugging (pprof). **Warning:** Do not enable in production.
 
--   `import` — Imports Companies House ZIP file into the database.
+-   `import-companies-house` — Imports Companies House ZIP file into the database.
     -   Options:
         -   `--zip-file <path>`: Path to Companies House .zip file (default: `./data/BasicCompanyDataAsOneFile-2025-07-01.zip`)
+
+-   `import-code-point` — Imports Codepoint ZIP file into the database.
+    -   Options:
+        -   `--zip-file <path>`: Path to Codepoint .zip file (default: `./data/codepo_gb.zip`)
 
 Example usage:
 
 ```sh
+./company-data import-companies-house --zip-file ./data/BasicCompanyDataAsOneFile-2025-07-01.zip
+./company-data import-code-point --zip-file ./data/codepo_gb.zip
 ./company-data api-server --db ./data/companies_data.db --port 8080
-./company-data import --zip-file ./data/BasicCompanyDataAsOneFile-2025-07-01.zip
 ```
 
 ### 1. Download Data
@@ -202,7 +206,7 @@ docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
 -   [ ] Pagination and filtering options
 -   [ ] Docker Compose for easier setup
 -   [ ] Automated data refresh/import
--   [X] OpenAPI/Swagger documentation (auto-generated from code)
+-   [x] OpenAPI/Swagger documentation (auto-generated from code)
 -   [ ] More robust error handling and logging
 -   [ ] Unit and integration tests for import and API layers
 
