@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
+func ImportCodepointZipFile(zipFile string, dbPath string) {
 	db, err := internal.Connect(dbPath)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)
@@ -16,8 +16,8 @@ func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
 		}
 	}()
 
-	err = internal.ImportCompanyData(zipFile, db)
+	err = internal.ImportCodePoint(zipFile, db)
 	if err != nil {
-		log.Fatalf("failed to import company data: %v", err)
+		log.Fatalf("failed to import code points: %v", err)
 	}
 }
