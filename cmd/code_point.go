@@ -1,8 +1,9 @@
 package cmd
 
 import (
-	"company-data-api/internal"
 	"log"
+
+	"github.com/rm-hull/company-data-api/internal"
 )
 
 func ImportCodepointZipFile(zipFile string, dbPath string) {

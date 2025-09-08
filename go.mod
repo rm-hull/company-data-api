@@ -1,4 +1,4 @@
-module company-data-api
+module github.com/rm-hull/company-data-api
 
 go 1.25
 

@@ -2,10 +2,11 @@ package internal
 
 import (
 	"archive/zip"
-	"company-data-api/models"
 	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/rm-hull/company-data-api/models"
 )
 
 func fromCompanyDataCSV(record []string, headers []string) (models.CompanyData, error) {

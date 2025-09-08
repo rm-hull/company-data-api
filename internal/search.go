@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"company-data-api/models"
-	repo "company-data-api/repositories"
 	"fmt"
 	"log"
 	"math"
@@ -10,6 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/rm-hull/company-data-api/models"
+	repo "github.com/rm-hull/company-data-api/repositories"
 
 	"github.com/gin-gonic/gin"
 )

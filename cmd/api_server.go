@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	_ "company-data-api/docs"
-	"company-data-api/internal"
-	"company-data-api/repositories"
 	"time"
+
+	_ "github.com/rm-hull/company-data-api/docs"
+	"github.com/rm-hull/company-data-api/internal"
+	"github.com/rm-hull/company-data-api/repositories"
 
 	"fmt"
 	"log"
