@@ -69,7 +69,11 @@ const InsertCodePointSQL = `
 		) VALUES (?,?,?)`
 
 func Connect(dbPath string, mode Mode) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", dbPath)
+	dsn := dbPath
+	if mode == ReadOnly {
+		dsn = dsn + "?mode=ro"
+	}
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
@@ -77,7 +81,7 @@ func Connect(dbPath string, mode Mode) (*sql.DB, error) {
 	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
-	log.Printf("connected to database: %s", dbPath)
+	log.Printf("connected to database: %s", dsn)
 
 	if mode == ReadWrite {
 		err = CreateDB(db)
