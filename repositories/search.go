@@ -1,11 +1,12 @@
 package repositories
 
 import (
-	"company-data-api/models"
 	"database/sql"
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/rm-hull/company-data-api/models"
 )
 
 const (

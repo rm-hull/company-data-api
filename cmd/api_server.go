@@ -1,13 +1,9 @@
 package cmd
 
 import (
-	_ "company-data-api/docs"
-	"company-data-api/internal"
-	"company-data-api/repositories"
-	"time"
-
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/Depado/ginprom"
 	"github.com/aurowora/compress"
@@ -15,6 +11,9 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/rm-hull/company-data-api/docs"
+	"github.com/rm-hull/company-data-api/internal"
+	"github.com/rm-hull/company-data-api/repositories"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	healthcheck "github.com/tavsec/gin-healthcheck"
