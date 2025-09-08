@@ -10,6 +10,13 @@ import (
 //go:embed migration.sql
 var migrationSQL string
 
+type Mode int
+
+const (
+	ReadOnly Mode = iota
+	ReadWrite
+)
+
 func CreateDB(db *sql.DB) error {
 	_, err := db.Exec(migrationSQL)
 	return err
@@ -61,7 +68,7 @@ const InsertCodePointSQL = `
 			northing
 		) VALUES (?,?,?)`
 
-func Connect(dbPath string) (*sql.DB, error) {
+func Connect(dbPath string, mode Mode) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
@@ -72,9 +79,11 @@ func Connect(dbPath string) (*sql.DB, error) {
 	}
 	log.Printf("connected to database: %s", dbPath)
 
-	err = CreateDB(db)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create database: %w", err)
+	if mode == ReadWrite {
+		err = CreateDB(db)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create database: %w", err)
+		}
 	}
 	return db, nil
 }
