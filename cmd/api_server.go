@@ -29,7 +29,7 @@ import (
 // @BasePath /v1/company-data
 func ApiServer(dbPath string, port int, debug bool) {
 
-	db, err := internal.Connect(dbPath)
+	db, err := internal.Connect(dbPath, internal.ReadOnly)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)
 	}

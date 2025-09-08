@@ -6,7 +6,7 @@ import (
 )
 
 func ImportCodepointZipFile(zipFile string, dbPath string) {
-	db, err := internal.Connect(dbPath)
+	db, err := internal.Connect(dbPath, internal.ReadWrite)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)
 	}
