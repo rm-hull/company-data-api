@@ -294,7 +294,6 @@ func TestImportCompanyData(t *testing.T) {
 	err = ImportCompanyData(zipPath, db)
 	assert.NoError(t, err)
 
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -324,8 +323,10 @@ func TestProcessCompanyDataCSV(t *testing.T) {
 			"category", sqlmock.AnyArg(), sqlmock.AnyArg(),
 			1, 1, 1, 1, "sic1", "sic2", "sic3", "sic4", 1, 1, "uri",
 			sqlmock.AnyArg(), sqlmock.AnyArg(),
-
-
+		).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
+	err = processCompanyDataCSV(r.File[0], db)
+	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
