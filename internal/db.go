@@ -29,9 +29,9 @@ func CreateDB(db *sql.DB) error {
 }
 
 func Connect(dbPath string, mode Mode) (*sql.DB, error) {
-	dsn := dbPath
+	dsn := dbPath + "?_journal_mode=WAL&_busy_timeout=5000"
 	if mode == ReadOnly {
-		dsn = dsn + "?mode=ro"
+		dsn = dsn + "&mode=ro"
 	}
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
