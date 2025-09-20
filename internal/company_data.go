@@ -179,7 +179,7 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 			if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {
 				return fmt.Errorf("failed to insert company data batch at line %d: %w", lineNum, err)
 			}
-			batch = nil // Clear the buffer
+			batch = batch[:0] // Clear the buffer, retaining capacity
 		}
 	}
 
@@ -210,8 +210,18 @@ func insertCompanyDataBatch(db *sql.DB, batch []models.CompanyData, lastLineNum 
 		}
 	}()
 
+	stmt, err := tx.Prepare(InsertCompanyDataSQL)
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Print("failed to close statment: %w", err)
+		}
+	}()
+
 	for _, companyData := range batch {
-		_, err = tx.Exec(InsertCompanyDataSQL, companyDataToTuple(companyData)...)
+		_, err = stmt.Exec(companyDataToTuple(companyData)...)
 		if err != nil {
 			return fmt.Errorf("failed to execute individual insert: %w", err)
 		}
