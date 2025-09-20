@@ -5,80 +5,39 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/rm-hull/company-data-api/models"
 )
 
-func fromCompanyDataCSV(record []string, headers []string) (models.CompanyData, error) {
+func fromCompanyDataCSV(record []string, headers []string) (*models.CompanyData, error) {
 	if len(record) < len(headers) {
-		return models.CompanyData{}, fmt.Errorf("record has fewer fields than headers: %d vs %d", len(record), len(headers))
+		return nil, fmt.Errorf("record has fewer fields than headers: %d vs %d", len(record), len(headers))
 	}
 
-	dissolutionDate, err := parseDate(record[13])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid DissolutionDate: %w", err)
-	}
-	incorporationDate, err := parseDate(record[14])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid IncorporationDate: %w", err)
-	}
-	confStmtNextDueDate, err := parseDate(record[53])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid ConfStmtNextDueDate: %w", err)
-	}
-	confStmtLastMadeUpDate, err := parseDate(record[54])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid ConfStmtLastMadeUpDate: %w", err)
+	var err error
+	parseDateField := func(index int, fieldName string) *time.Time {
+		if err != nil {
+			return nil
+		}
+		var date *time.Time
+		date, err = parseDate(record[index])
+		if err != nil {
+			err = fmt.Errorf("invalid %s: %w", fieldName, err)
+		}
+		return date
 	}
 
-	accountsNextDueDate, err := parseDate(record[17])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid AccountsNextDueDate: %w", err)
-	}
-	accountsLastMadeUpDate, err := parseDate(record[18])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid AccountsLastMadeUpDate: %w", err)
-	}
-	returnsNextDueDate, err := parseDate(record[20])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid ReturnsNextDueDate: %w", err)
-	}
-	returnsLastMadeUpDate, err := parseDate(record[21])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid ReturnsLastMadeUpDate: %w", err)
-	}
-
-	accountsAccountRefDay, err := parseInt(record[15])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid AccountsAccountRefDay: %w", err)
-	}
-	accountsAccountRefMonth, err := parseInt(record[16])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid AccountsAccountRefMonth: %w", err)
-	}
-	mortgagesNumCharges, err := parseInt(record[22])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumCharges: %w", err)
-	}
-	mortgagesNumOutstanding, err := parseInt(record[23])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumOutstanding: %w", err)
-	}
-	mortgagesNumPartSatisfied, err := parseInt(record[24])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumPartSatisfied: %w", err)
-	}
-	mortgagesNumSatisfied, err := parseInt(record[25])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumSatisfied: %w", err)
-	}
-	limitedPartnershipsNumGenPartners, err := parseInt(record[30])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid LimitedPartnershipsNumGenPartners: %w", err)
-	}
-	limitedPartnershipsNumLimPartners, err := parseInt(record[31])
-	if err != nil {
-		return models.CompanyData{}, fmt.Errorf("invalid LimitedPartnershipsNumLimPartners: %w", err)
+	parseIntField := func(index int, fieldName string) int {
+		if err != nil {
+			return 0
+		}
+		var val int
+		val, err = parseInt(record[index])
+		if err != nil {
+			err = fmt.Errorf("invalid %s: %w", fieldName, err)
+		}
+		return val
 	}
 
 	company := models.CompanyData{
@@ -95,31 +54,35 @@ func fromCompanyDataCSV(record []string, headers []string) (models.CompanyData, 
 		CompanyCategory:                   record[10],
 		CompanyStatus:                     record[11],
 		CountryOfOrigin:                   record[12],
-		DissolutionDate:                   dissolutionDate,
-		IncorporationDate:                 incorporationDate,
-		AccountsAccountRefDay:             accountsAccountRefDay,
-		AccountsAccountRefMonth:           accountsAccountRefMonth,
-		AccountsNextDueDate:               accountsNextDueDate,
-		AccountsLastMadeUpDate:            accountsLastMadeUpDate,
+		DissolutionDate:                   parseDateField(13, "DissolutionDate"),
+		IncorporationDate:                 parseDateField(14, "IncorporationDate"),
+		AccountsAccountRefDay:             parseIntField(15, "AccountsAccountRefDay"),
+		AccountsAccountRefMonth:           parseIntField(16, "AccountsAccountRefMonth"),
+		AccountsNextDueDate:               parseDateField(17, "AccountsNextDueDate"),
+		AccountsLastMadeUpDate:            parseDateField(18, "AccountsLastMadeUpDate"),
 		AccountsAccountCategory:           record[19],
-		ReturnsNextDueDate:                returnsNextDueDate,
-		ReturnsLastMadeUpDate:             returnsLastMadeUpDate,
-		MortgagesNumCharges:               mortgagesNumCharges,
-		MortgagesNumOutstanding:           mortgagesNumOutstanding,
-		MortgagesNumPartSatisfied:         mortgagesNumPartSatisfied,
-		MortgagesNumSatisfied:             mortgagesNumSatisfied,
+		ReturnsNextDueDate:                parseDateField(20, "ReturnsNextDueDate"),
+		ReturnsLastMadeUpDate:             parseDateField(21, "ReturnsLastMadeUpDate"),
+		MortgagesNumCharges:               parseIntField(22, "MortgagesNumCharges"),
+		MortgagesNumOutstanding:           parseIntField(23, "MortgagesNumOutstanding"),
+		MortgagesNumPartSatisfied:         parseIntField(24, "MortgagesNumPartSatisfied"),
+		MortgagesNumSatisfied:             parseIntField(25, "MortgagesNumSatisfied"),
 		SICCode1:                          record[26],
 		SICCode2:                          record[27],
 		SICCode3:                          record[28],
 		SICCode4:                          record[29],
-		LimitedPartnershipsNumGenPartners: limitedPartnershipsNumGenPartners,
-		LimitedPartnershipsNumLimPartners: limitedPartnershipsNumLimPartners,
+		LimitedPartnershipsNumGenPartners: parseIntField(30, "LimitedPartnershipsNumGenPartners"),
+		LimitedPartnershipsNumLimPartners: parseIntField(31, "LimitedPartnershipsNumLimPartners"),
 		URI:                               record[32],
-		ConfStmtNextDueDate:               confStmtNextDueDate,
-		ConfStmtLastMadeUpDate:            confStmtLastMadeUpDate,
+		ConfStmtNextDueDate:               parseDateField(53, "ConfStmtNextDueDate"),
+		ConfStmtLastMadeUpDate:            parseDateField(54, "ConfStmtLastMadeUpDate"),
 	}
 
-	return company, nil
+	if err != nil {
+		return nil, err
+	}
+
+	return &company, nil
 }
 
 func companyDataToTuple(companyData models.CompanyData) []any {
@@ -206,7 +169,7 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 			return fmt.Errorf("error parsing line %d: %w", lineNum, result.Error)
 		}
 
-		batch = append(batch, result.Value)
+		batch = append(batch, *result.Value)
 
 		if len(batch) >= batchSize {
 			if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {

@@ -73,7 +73,7 @@ func TestFromCompanyDataCSV(t *testing.T) {
 	confStmtNextDueDate := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
 	confStmtLastMadeUpDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	expected := models.CompanyData{
+	expected := &models.CompanyData{
 		CompanyName:                       "company",
 		CompanyNumber:                     "123456",
 		RegAddressAddressLine1:            "address1",
