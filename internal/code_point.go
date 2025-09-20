@@ -89,7 +89,7 @@ func insertCodePointBatch(db *sql.DB, batch []CodePoint) error {
 	}
 	defer func() {
 		if err := stmt.Close(); err != nil {
-			log.Print("failed to close statement: %w", err)
+			log.Printf("failed to close statement: %v", err)
 		}
 	}()
 
@@ -117,11 +117,10 @@ func processCodePointCSV(f *zip.File, db *sql.DB) (int, error) {
 		}
 	}()
 
-	var (
-		batch   []CodePoint
-		lineNum int
-	)
+	batch := make([]CodePoint, 0)
+	lineNum := 0
 
+	const batchSize = 5000
 	for result := range parseCSV(r, false, fromCodePointCSV) {
 		lineNum = result.LineNum
 		if result.Error != nil {
@@ -129,6 +128,13 @@ func processCodePointCSV(f *zip.File, db *sql.DB) (int, error) {
 		}
 
 		batch = append(batch, *result.Value)
+
+		if len(batch) >= batchSize {
+			if err := insertCodePointBatch(db, batch); err != nil {
+				return 0, fmt.Errorf("failed to insert batch: %w", err)
+			}
+			batch = batch[:0]
+		}
 	}
 
 	if len(batch) > 0 {
