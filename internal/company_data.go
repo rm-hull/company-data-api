@@ -179,7 +179,7 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 			if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {
 				return fmt.Errorf("failed to insert company data batch at line %d: %w", lineNum, err)
 			}
-			batch = nil // Clear the buffer
+			batch = batch[:0] // Clear the buffer, retaining capacity
 		}
 	}
 
