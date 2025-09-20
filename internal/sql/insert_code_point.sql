@@ -1,0 +1,1 @@
+INSERT OR REPLACE INTO code_point (post_code, easting, northing) VALUES (?,?,?)
