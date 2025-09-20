@@ -68,18 +68,16 @@ func TestParseCSVWithoutHeader(t *testing.T) {
 		{Value: testData{Name: "Jane Doe", Age: 25}, LineNum: 2},
 	}
 
-	i := 0
+	var actual []Result[testData]
 	for result := range results {
-		if result.Error != nil {
-			t.Errorf("unexpected error: %v", result.Error)
-		}
-		if result.Value != expected[i].Value {
-			t.Errorf("expected value %v, got %v", expected[i].Value, result.Value)
-		}
-		if result.LineNum != expected[i].LineNum {
-			t.Errorf("expected line number %d, got %d", expected[i].LineNum, result.LineNum)
-		}
-		i++
+		actual = append(actual, result)
+	}
+
+	require.Len(t, actual, len(expected))
+	for i := range expected {
+		require.NoError(t, actual[i].Error)
+		assert.Equal(t, expected[i].Value, actual[i].Value)
+		assert.Equal(t, expected[i].LineNum, actual[i].LineNum)
 	}
 }
 
@@ -91,13 +89,13 @@ func TestParseCSVMalformed(t *testing.T) {
 	reader := strings.NewReader(csvData)
 	results := parseCSV(reader, true, fromFunc)
 
-	i := 0
+	var resultsSlice []Result[testData]
 	for result := range results {
-		if i == 1 && result.Error == nil {
-			t.Errorf("expected error on line 2, got nil")
-		}
-		i++
+		resultsSlice = append(resultsSlice, result)
 	}
+	require.Len(t, resultsSlice, 2, "expected two results")
+	assert.NoError(t, resultsSlice[0].Error, "first result should not have an error")
+	assert.Error(t, resultsSlice[1].Error, "second result should have an error")
 }
 
 func TestParseCSVEmpty(t *testing.T) {
@@ -105,11 +103,12 @@ func TestParseCSVEmpty(t *testing.T) {
 	reader := strings.NewReader(csvData)
 	results := parseCSV(reader, true, fromFunc)
 
+	var resultsSlice []Result[testData]
 	for result := range results {
-		if result.Error == nil {
-			t.Errorf("expected error, got nil")
-		}
+		resultsSlice = append(resultsSlice, result)
 	}
+	require.Len(t, resultsSlice, 1, "expected one result for an empty file")
+	assert.Error(t, resultsSlice[0].Error, "expected an error for an empty file")
 }
 
 func TestParseCSVFromFuncError(t *testing.T) {
@@ -122,9 +121,10 @@ func TestParseCSVFromFuncError(t *testing.T) {
 	}
 	results := parseCSV(reader, true, fromFuncErr)
 
+	var resultsSlice []Result[testData]
 	for result := range results {
-		if result.Error == nil {
-			t.Errorf("expected error, got nil")
-		}
+		resultsSlice = append(resultsSlice, result)
 	}
+	require.Len(t, resultsSlice, 1, "expected one result")
+	assert.Error(t, resultsSlice[0].Error, "expected an error from fromFunc")
 }
