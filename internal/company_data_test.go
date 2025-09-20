@@ -207,6 +207,7 @@ func TestCompanyDataToTuple(t *testing.T) {
 
 // createTestZip creates a temporary zip file with a single CSV file for testing
 func createTestZip(t *testing.T) string {
+	t.Helper()
 	tempFile, err := os.CreateTemp("", "test-*.zip")
 	assert.NoError(t, err)
 	defer tempFile.Close()
