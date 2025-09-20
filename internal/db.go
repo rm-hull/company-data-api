@@ -36,10 +36,13 @@ func Connect(dbPath string, mode Mode) (*sql.DB, error) {
 	} else {
 		dsn += "?"
 	}
-	dsn += "_journal_mode=WAL&_busy_timeout=5000"
+	queryParams := []string{"_busy_timeout=5000"}
 	if mode == ReadOnly {
-		dsn += "&mode=ro"
+		queryParams = append(queryParams, "mode=ro")
+	} else {
+		queryParams = append(queryParams, "_journal_mode=WAL")
 	}
+	dsn += strings.Join(queryParams, "&")
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
