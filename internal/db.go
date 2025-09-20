@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 	"log"
+	"strings"
 )
 
 //go:embed sql/migration.sql
@@ -30,8 +31,14 @@ func CreateDB(db *sql.DB) error {
 
 func Connect(dbPath string, mode Mode) (*sql.DB, error) {
 	dsn := dbPath
+	if strings.Contains(dsn, "?") {
+		dsn += "&"
+	} else {
+		dsn += "?"
+	}
+	dsn += "_journal_mode=WAL&_busy_timeout=5000"
 	if mode == ReadOnly {
-		dsn = dsn + "?mode=ro"
+		dsn += "&mode=ro"
 	}
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
