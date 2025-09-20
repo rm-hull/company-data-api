@@ -50,7 +50,7 @@ func ImportCodePoint(zipPath string, db *sql.DB) error {
 		}
 	}()
 
-	var totalRecordsProcessed int
+	totalRecordsImported := 0
 	for _, f := range r.File {
 		if f.FileInfo().IsDir() || !strings.HasPrefix(f.Name, "Data/CSV/") {
 			continue
@@ -60,9 +60,9 @@ func ImportCodePoint(zipPath string, db *sql.DB) error {
 			return fmt.Errorf("failed to process CSV data: %w", err)
 		}
 		log.Printf("Processed file: %s (inserted %d records)", f.Name, recordsInFile)
-		totalRecordsProcessed += recordsInFile
+		totalRecordsImported += recordsInFile
 	}
-	log.Printf("Total records imported: %d", totalRecordsProcessed)
+	log.Printf("Total records imported: %d", totalRecordsImported)
 	return nil
 }
 
