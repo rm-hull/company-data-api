@@ -216,7 +216,7 @@ func insertCompanyDataBatch(db *sql.DB, batch []models.CompanyData, lastLineNum 
 	}
 	defer func() {
 		if err := stmt.Close(); err != nil {
-			log.Print("failed to close statment: %w", err)
+			log.Print("failed to close statement: %w", err)
 		}
 	}()
 
