@@ -2,8 +2,10 @@ package internal
 
 import (
 	"archive/zip"
+	"bytes"
 	"encoding/csv"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"testing"
@@ -110,14 +112,25 @@ func TestImportCodePoint(t *testing.T) {
 		assert.NoError(t, os.Remove(zipPath))
 	}()
 
+	// Capture log output
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	defer func() {
+		log.SetOutput(os.Stderr) // Restore default output
+	}()
+
+	mock.ExpectBegin()
 	mock.ExpectPrepare(InsertCodePointSQL)
 	mock.ExpectExec(InsertCodePointSQL).
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 
 	err = ImportCodePoint(zipPath, db)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
+
+	assert.Contains(t, buf.String(), "Total records imported: 1")
 }
 
 func TestImportCodePointMultipleRecords(t *testing.T) {
@@ -130,16 +143,27 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 		assert.NoError(t, os.Remove(zipPath))
 	}()
 
+	// Capture log output
+	var buf bytes.Buffer
+	log.SetOutput(&buf)
+	defer func() {
+		log.SetOutput(os.Stderr) // Restore default output
+	}()
+
+	mock.ExpectBegin()
 	mock.ExpectPrepare(InsertCodePointSQL)
 	for i := 0; i < numRecords; i++ {
 		mock.ExpectExec(InsertCodePointSQL).
 			WithArgs(fmt.Sprintf("AB12 3CD%d", i), 300000+i, 700000+i).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 	}
+	mock.ExpectCommit()
 
 	err = ImportCodePoint(zipPath, db)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
+
+	assert.Contains(t, buf.String(), fmt.Sprintf("Total records imported: %d", numRecords))
 }
 
 func TestImportCodePointPrepareError(t *testing.T) {
@@ -151,7 +175,9 @@ func TestImportCodePointPrepareError(t *testing.T) {
 		assert.NoError(t, os.Remove(zipPath))
 	}()
 
+	mock.ExpectBegin()
 	mock.ExpectPrepare(InsertCodePointSQL).WillReturnError(fmt.Errorf("prepare error"))
+	mock.ExpectRollback()
 
 	err = ImportCodePoint(zipPath, db)
 	assert.Error(t, err)
@@ -168,14 +194,16 @@ func TestImportCodePointExecError(t *testing.T) {
 		assert.NoError(t, os.Remove(zipPath))
 	}()
 
+	mock.ExpectBegin()
 	mock.ExpectPrepare(InsertCodePointSQL)
 	mock.ExpectExec(InsertCodePointSQL).
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnError(fmt.Errorf("exec error"))
+	mock.ExpectRollback()
 
 	err = ImportCodePoint(zipPath, db)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to insert code point for line 1: exec error")
+	assert.Contains(t, err.Error(), "failed to execute individual insert: exec error")
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
@@ -194,10 +222,12 @@ func TestProcessCodePointCSV(t *testing.T) {
 		assert.NoError(t, r.Close())
 	}()
 
+	mock.ExpectBegin()
 	mock.ExpectPrepare(InsertCodePointSQL)
 	mock.ExpectExec(InsertCodePointSQL).
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 
 	// Find the CSV file within the zip
 	var csvFile *zip.File
@@ -209,13 +239,8 @@ func TestProcessCodePointCSV(t *testing.T) {
 	}
 	assert.NotNil(t, csvFile, "CSV file not found in zip")
 
-	stmt, err := db.Prepare(InsertCodePointSQL)
-	assert.NoError(t, err)
-	defer func() {
-		assert.NoError(t, stmt.Close())
-	}()
-
-	err = processCodePointCSV(csvFile, stmt)
+	numRecords, err := processCodePointCSV(csvFile, db)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.Equal(t, 1, numRecords)
 }

@@ -40,16 +40,6 @@ func codePointToTuple(codePoint CodePoint) []any {
 }
 
 func ImportCodePoint(zipPath string, db *sql.DB) error {
-	stmt, err := db.Prepare(InsertCodePointSQL)
-	if err != nil {
-		return fmt.Errorf("failed to prepare statement: %w", err)
-	}
-	defer func() {
-		if err := stmt.Close(); err != nil {
-			log.Printf("error closing statement: %v", err)
-		}
-	}()
-
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)
@@ -60,23 +50,66 @@ func ImportCodePoint(zipPath string, db *sql.DB) error {
 		}
 	}()
 
+	var totalRecordsProcessed int
 	for _, f := range r.File {
 		if f.FileInfo().IsDir() || !strings.HasPrefix(f.Name, "Data/CSV/") {
 			continue
 		}
-		log.Printf("Checking file: %s", f.Name)
-
-		if err := processCodePointCSV(f, stmt); err != nil {
+		recordsInFile, err := processCodePointCSV(f, db)
+		if err != nil {
 			return fmt.Errorf("failed to process CSV data: %w", err)
 		}
+		log.Printf("Processed file: %s (inserted %d records)", f.Name, recordsInFile)
+		totalRecordsProcessed += recordsInFile
+	}
+	log.Printf("Total records imported: %d", totalRecordsProcessed)
+	return nil
+}
+
+func insertCodePointBatch(db *sql.DB, batch []CodePoint) error {
+	if len(batch) == 0 {
+		return nil
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				log.Printf("error rolling back transaction: %v", rbErr)
+			}
+		}
+	}()
+
+	stmt, err := tx.Prepare(InsertCodePointSQL)
+	if err != nil {
+		return fmt.Errorf("failed to prepare statement: %w", err)
+	}
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Print("failed to close statement: %w", err)
+		}
+	}()
+
+	for _, codePoint := range batch {
+		_, err = stmt.Exec(codePointToTuple(codePoint)...)
+		if err != nil {
+			return fmt.Errorf("failed to execute individual insert: %w", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 	return nil
 }
 
-func processCodePointCSV(f *zip.File, stmt *sql.Stmt) error {
+func processCodePointCSV(f *zip.File, db *sql.DB) (int, error) {
 	r, err := f.Open()
 	if err != nil {
-		return fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
+		return 0, fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
 	}
 	defer func() {
 		if err := r.Close(); err != nil {
@@ -84,20 +117,24 @@ func processCodePointCSV(f *zip.File, stmt *sql.Stmt) error {
 		}
 	}()
 
+	var (
+		batch   []CodePoint
+		lineNum int
+	)
+
 	for result := range parseCSV(r, false, fromCodePointCSV) {
+		lineNum = result.LineNum
 		if result.Error != nil {
-			return fmt.Errorf("error parsing line %d: %w", result.LineNum, result.Error)
+			return 0, fmt.Errorf("error parsing line %d: %w", lineNum, result.Error)
 		}
 
-		_, err := stmt.Exec(codePointToTuple(*result.Value)...)
-		if err != nil {
-			return fmt.Errorf("failed to insert code point for line %d: %w", result.LineNum, err)
-		}
-
-		if result.LineNum%379 == 0 {
-			log.Printf("Inserted %d records...", result.LineNum)
-		}
+		batch = append(batch, *result.Value)
 	}
 
-	return nil
+	if len(batch) > 0 {
+		if err := insertCodePointBatch(db, batch); err != nil {
+			return 0, fmt.Errorf("failed to insert batch: %w", err)
+		}
+	}
+	return lineNum, nil
 }
