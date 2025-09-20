@@ -19,10 +19,13 @@ func parseDate(dateStr string) (*time.Time, error) {
 	return &t, nil
 }
 
-func parseInt(s string) int {
+func parseInt(s string) (int, error) {
+	if s == "" {
+		return 0, nil
+	}
 	n, err := strconv.Atoi(s)
 	if err != nil {
-		return 0
+		return 0, fmt.Errorf("failed to parse int %q: %w", s, err)
 	}
-	return n
+	return n, nil
 }

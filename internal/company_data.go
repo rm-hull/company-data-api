@@ -48,6 +48,39 @@ func fromCompanyDataCSV(record []string, headers []string) (models.CompanyData, 
 		return models.CompanyData{}, fmt.Errorf("invalid ReturnsLastMadeUpDate: %w", err)
 	}
 
+	accountsAccountRefDay, err := parseInt(record[15])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid AccountsAccountRefDay: %w", err)
+	}
+	accountsAccountRefMonth, err := parseInt(record[16])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid AccountsAccountRefMonth: %w", err)
+	}
+	mortgagesNumCharges, err := parseInt(record[22])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumCharges: %w", err)
+	}
+	mortgagesNumOutstanding, err := parseInt(record[23])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumOutstanding: %w", err)
+	}
+	mortgagesNumPartSatisfied, err := parseInt(record[24])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumPartSatisfied: %w", err)
+	}
+	mortgagesNumSatisfied, err := parseInt(record[25])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid MortgagesNumSatisfied: %w", err)
+	}
+	limitedPartnershipsNumGenPartners, err := parseInt(record[30])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid LimitedPartnershipsNumGenPartners: %w", err)
+	}
+	limitedPartnershipsNumLimPartners, err := parseInt(record[31])
+	if err != nil {
+		return models.CompanyData{}, fmt.Errorf("invalid LimitedPartnershipsNumLimPartners: %w", err)
+	}
+
 	company := models.CompanyData{
 		CompanyName:                       record[0],
 		CompanyNumber:                     record[1],
@@ -64,23 +97,23 @@ func fromCompanyDataCSV(record []string, headers []string) (models.CompanyData, 
 		CountryOfOrigin:                   record[12],
 		DissolutionDate:                   dissolutionDate,
 		IncorporationDate:                 incorporationDate,
-		AccountsAccountRefDay:             parseInt(record[15]),
-		AccountsAccountRefMonth:           parseInt(record[16]),
+		AccountsAccountRefDay:             accountsAccountRefDay,
+		AccountsAccountRefMonth:           accountsAccountRefMonth,
 		AccountsNextDueDate:               accountsNextDueDate,
 		AccountsLastMadeUpDate:            accountsLastMadeUpDate,
 		AccountsAccountCategory:           record[19],
 		ReturnsNextDueDate:                returnsNextDueDate,
 		ReturnsLastMadeUpDate:             returnsLastMadeUpDate,
-		MortgagesNumCharges:               parseInt(record[22]),
-		MortgagesNumOutstanding:           parseInt(record[23]),
-		MortgagesNumPartSatisfied:         parseInt(record[24]),
-		MortgagesNumSatisfied:             parseInt(record[25]),
+		MortgagesNumCharges:               mortgagesNumCharges,
+		MortgagesNumOutstanding:           mortgagesNumOutstanding,
+		MortgagesNumPartSatisfied:         mortgagesNumPartSatisfied,
+		MortgagesNumSatisfied:             mortgagesNumSatisfied,
 		SICCode1:                          record[26],
 		SICCode2:                          record[27],
 		SICCode3:                          record[28],
 		SICCode4:                          record[29],
-		LimitedPartnershipsNumGenPartners: parseInt(record[30]),
-		LimitedPartnershipsNumLimPartners: parseInt(record[31]),
+		LimitedPartnershipsNumGenPartners: limitedPartnershipsNumGenPartners,
+		LimitedPartnershipsNumLimPartners: limitedPartnershipsNumLimPartners,
 		URI:                               record[32],
 		ConfStmtNextDueDate:               confStmtNextDueDate,
 		ConfStmtLastMadeUpDate:            confStmtLastMadeUpDate,
