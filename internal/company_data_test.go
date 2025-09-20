@@ -273,7 +273,6 @@ func createTestZip(t *testing.T, numRecords int) string {
 func TestImportCompanyData(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
-	defer db.Close()
 
 	zipPath := createTestZip(t, 1) // Create a zip with 1 record
 	defer func() {
@@ -293,14 +292,12 @@ func TestImportCompanyData(t *testing.T) {
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 	err = ImportCompanyData(zipPath, db)
 	assert.NoError(t, err)
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
 func TestProcessCompanyDataCSV(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
-	defer db.Close()
 
 	zipPath := createTestZip(t, 1) // Create a zip with 1 record
 	defer func() {
@@ -333,7 +330,6 @@ func TestProcessCompanyDataCSV(t *testing.T) {
 func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
-	defer db.Close()
 
 	numRecords := batchSize*2 + 1 // More than two batches
 	zipPath := createTestZip(t, numRecords)
@@ -362,8 +358,6 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	}
 	err = processCompanyDataCSV(r.File[0], db)
 	assert.NoError(t, err)
-
 	mock.ExpectCommit()
-
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
