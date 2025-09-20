@@ -99,16 +99,31 @@ func TestParseCSVMalformed(t *testing.T) {
 }
 
 func TestParseCSVEmpty(t *testing.T) {
-	csvData := ``
-	reader := strings.NewReader(csvData)
-	results := parseCSV(reader, true, fromFunc)
-
-	var resultsSlice []Result[testData]
-	for result := range results {
-		resultsSlice = append(resultsSlice, result)
+	cases := map[string]struct {
+		withHeader        bool
+		expectedNumResult int
+		expectError       bool
+	}{
+		"with header":    {true, 1, true},
+		"without header": {false, 0, false},
 	}
-	require.Len(t, resultsSlice, 1, "expected one result for an empty file")
-	assert.Error(t, resultsSlice[0].Error, "expected an error for an empty file")
+
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			reader := strings.NewReader("")
+			results := parseCSV(reader, tc.withHeader, fromFunc)
+
+			var resultsSlice []Result[testData]
+			for result := range results {
+				resultsSlice = append(resultsSlice, result)
+			}
+
+			require.Len(t, resultsSlice, tc.expectedNumResult)
+			if tc.expectError {
+				assert.Error(t, resultsSlice[0].Error)
+			}
+		})
+	}
 }
 
 func TestParseCSVFromFuncError(t *testing.T) {
