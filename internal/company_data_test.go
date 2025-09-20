@@ -5,7 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/csv"
 	"errors"
-	
+
 	"os"
 	"testing"
 	"time"
@@ -75,39 +75,39 @@ func TestFromCompanyDataCSV(t *testing.T) {
 	confStmtLastMadeUpDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	expected := models.CompanyData{
-		CompanyName:             "company",
-		CompanyNumber:           "123456",
-		RegAddressAddressLine1:  "address1",
-		RegAddressAddressLine2:  "address2",
-		RegAddressPostTown:      "posttown",
-		RegAddressCounty:        "county",
-		RegAddressCountry:       "country",
-		RegAddressPostCode:      "postcode",
-		CompanyCategory:         "category",
-		CompanyStatus:           "status",
-		CountryOfOrigin:         "origin",
-		DissolutionDate:         &dissolutionDate,
-		IncorporationDate:       &incorporationDate,
-		AccountsAccountRefDay:   1,
-		AccountsAccountRefMonth: 1,
-		AccountsNextDueDate:     &accountsNextDueDate,
-		AccountsLastMadeUpDate:  &accountsLastMadeUpDate,
-		AccountsAccountCategory: "category",
-		ReturnsNextDueDate:      &returnsNextDueDate,
-		ReturnsLastMadeUpDate:   &returnsLastMadeUpDate,
-		MortgagesNumCharges:     1,
-		MortgagesNumOutstanding: 1,
-		MortgagesNumPartSatisfied: 1,
-		MortgagesNumSatisfied:   1,
-		SICCode1:                "sic1",
-		SICCode2:                "sic2",
-		SICCode3:                "sic3",
-		SICCode4:                "sic4",
+		CompanyName:                       "company",
+		CompanyNumber:                     "123456",
+		RegAddressAddressLine1:            "address1",
+		RegAddressAddressLine2:            "address2",
+		RegAddressPostTown:                "posttown",
+		RegAddressCounty:                  "county",
+		RegAddressCountry:                 "country",
+		RegAddressPostCode:                "postcode",
+		CompanyCategory:                   "category",
+		CompanyStatus:                     "status",
+		CountryOfOrigin:                   "origin",
+		DissolutionDate:                   &dissolutionDate,
+		IncorporationDate:                 &incorporationDate,
+		AccountsAccountRefDay:             1,
+		AccountsAccountRefMonth:           1,
+		AccountsNextDueDate:               &accountsNextDueDate,
+		AccountsLastMadeUpDate:            &accountsLastMadeUpDate,
+		AccountsAccountCategory:           "category",
+		ReturnsNextDueDate:                &returnsNextDueDate,
+		ReturnsLastMadeUpDate:             &returnsLastMadeUpDate,
+		MortgagesNumCharges:               1,
+		MortgagesNumOutstanding:           1,
+		MortgagesNumPartSatisfied:         1,
+		MortgagesNumSatisfied:             1,
+		SICCode1:                          "sic1",
+		SICCode2:                          "sic2",
+		SICCode3:                          "sic3",
+		SICCode4:                          "sic4",
 		LimitedPartnershipsNumGenPartners: 1,
 		LimitedPartnershipsNumLimPartners: 1,
-		URI:                     "uri",
-		ConfStmtNextDueDate:     &confStmtNextDueDate,
-		ConfStmtLastMadeUpDate:  &confStmtLastMadeUpDate,
+		URI:                               "uri",
+		ConfStmtNextDueDate:               &confStmtNextDueDate,
+		ConfStmtLastMadeUpDate:            &confStmtLastMadeUpDate,
 	}
 
 	actual, err := fromCompanyDataCSV(record, headers)
@@ -151,39 +151,39 @@ func TestCompanyDataToTuple(t *testing.T) {
 	confStmtLastMadeUpDate := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
 
 	companyData := models.CompanyData{
-		CompanyName:             "company",
-		CompanyNumber:           "123456",
-		RegAddressAddressLine1:  "address1",
-		RegAddressAddressLine2:  "address2",
-		RegAddressPostTown:      "posttown",
-		RegAddressCounty:        "county",
-		RegAddressCountry:       "country",
-		RegAddressPostCode:      "postcode",
-		CompanyCategory:         "category",
-		CompanyStatus:           "status",
-		CountryOfOrigin:         "origin",
-		DissolutionDate:         &dissolutionDate,
-		IncorporationDate:       &incorporationDate,
-		AccountsAccountRefDay:   1,
-		AccountsAccountRefMonth: 1,
-		AccountsNextDueDate:     &accountsNextDueDate,
-		AccountsLastMadeUpDate:  &accountsLastMadeUpDate,
-		AccountsAccountCategory: "category",
-		ReturnsNextDueDate:      &returnsNextDueDate,
-		ReturnsLastMadeUpDate:   &returnsLastMadeUpDate,
-		MortgagesNumCharges:     1,
-		MortgagesNumOutstanding: 1,
-		MortgagesNumPartSatisfied: 1,
-		MortgagesNumSatisfied:   1,
-		SICCode1:                "sic1",
-		SICCode2:                "sic2",
-		SICCode3:                "sic3",
-		SICCode4:                "sic4",
+		CompanyName:                       "company",
+		CompanyNumber:                     "123456",
+		RegAddressAddressLine1:            "address1",
+		RegAddressAddressLine2:            "address2",
+		RegAddressPostTown:                "posttown",
+		RegAddressCounty:                  "county",
+		RegAddressCountry:                 "country",
+		RegAddressPostCode:                "postcode",
+		CompanyCategory:                   "category",
+		CompanyStatus:                     "status",
+		CountryOfOrigin:                   "origin",
+		DissolutionDate:                   &dissolutionDate,
+		IncorporationDate:                 &incorporationDate,
+		AccountsAccountRefDay:             1,
+		AccountsAccountRefMonth:           1,
+		AccountsNextDueDate:               &accountsNextDueDate,
+		AccountsLastMadeUpDate:            &accountsLastMadeUpDate,
+		AccountsAccountCategory:           "category",
+		ReturnsNextDueDate:                &returnsNextDueDate,
+		ReturnsLastMadeUpDate:             &returnsLastMadeUpDate,
+		MortgagesNumCharges:               1,
+		MortgagesNumOutstanding:           1,
+		MortgagesNumPartSatisfied:         1,
+		MortgagesNumSatisfied:             1,
+		SICCode1:                          "sic1",
+		SICCode2:                          "sic2",
+		SICCode3:                          "sic3",
+		SICCode4:                          "sic4",
 		LimitedPartnershipsNumGenPartners: 1,
 		LimitedPartnershipsNumLimPartners: 1,
-		URI:                     "uri",
-		ConfStmtNextDueDate:     &confStmtNextDueDate,
-		ConfStmtLastMadeUpDate:  &confStmtLastMadeUpDate,
+		URI:                               "uri",
+		ConfStmtNextDueDate:               &confStmtNextDueDate,
+		ConfStmtLastMadeUpDate:            &confStmtLastMadeUpDate,
 	}
 
 	expected := []any{
@@ -210,10 +210,16 @@ func createTestZip(t *testing.T) string {
 	t.Helper()
 	tempFile, err := os.CreateTemp("", "test-*.zip")
 	assert.NoError(t, err)
-	defer tempFile.Close()
+	defer func() {
+		if err := tempFile.Close(); err != nil {
+			t.Fatalf("Failed to close temporary file: %v", err)
+		}
+	}()
 
 	zipWriter := zip.NewWriter(tempFile)
-	defer zipWriter.Close()
+	defer func() {
+		assert.NoError(t, zipWriter.Close())
+	}()
 
 	f, err := zipWriter.Create("test.csv")
 	assert.NoError(t, err)
@@ -223,7 +229,7 @@ func createTestZip(t *testing.T) string {
 
 	headers := make([]string, 55)
 	headers[0] = "CompanyName"
-	csvWriter.Write(headers)
+	assert.NoError(t, csvWriter.Write(headers))
 
 	record := make([]string, 55)
 	record[0] = "company"
@@ -259,7 +265,7 @@ func createTestZip(t *testing.T) string {
 	record[32] = "uri"
 	record[53] = "01/01/2025"
 	record[54] = "01/01/2024"
-	csvWriter.Write(record)
+	assert.NoError(t, csvWriter.Write(record))
 
 	return tempFile.Name()
 }
@@ -267,10 +273,11 @@ func createTestZip(t *testing.T) string {
 func TestImportCompanyData(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
-	defer db.Close()
 
 	zipPath := createTestZip(t)
-	defer os.Remove(zipPath)
+	defer func() {
+		assert.NoError(t, os.Remove(zipPath))
+	}()
 
 	stmt := mock.ExpectPrepare(InsertCompanyDataSQL)
 	stmt.ExpectExec().WillReturnResult(sqlmock.NewResult(1, 1))
@@ -284,14 +291,17 @@ func TestImportCompanyData(t *testing.T) {
 func TestProcessCompanyDataCSV(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
-	defer db.Close()
 
 	zipPath := createTestZip(t)
-	defer os.Remove(zipPath)
+	defer func() {
+		assert.NoError(t, os.Remove(zipPath))
+	}()
 
 	r, err := zip.OpenReader(zipPath)
 	assert.NoError(t, err)
-	defer r.Close()
+	defer func() {
+		assert.NoError(t, r.Close())
+	}()
 
 	args := []driver.Value{
 		"company", "123456", "", "", "address1", "address2", "posttown", "county",
@@ -318,14 +328,17 @@ func TestProcessCompanyDataCSV(t *testing.T) {
 func TestProcessCompanyDataCSVError(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
-	defer db.Close()
 
 	zipPath := createTestZip(t)
-	defer os.Remove(zipPath)
+	defer func() {
+		assert.NoError(t, os.Remove(zipPath))
+	}()
 
 	r, err := zip.OpenReader(zipPath)
 	assert.NoError(t, err)
-	defer r.Close()
+	defer func() {
+		assert.NoError(t, r.Close())
+	}()
 
 	stmt := mock.ExpectPrepare(InsertCompanyDataSQL)
 	stmt.ExpectExec().WillReturnError(errors.New("DB error"))

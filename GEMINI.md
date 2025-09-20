@@ -20,6 +20,7 @@ To build and run the project using Go, you will need to have Go installed on you
 1.  **Build the application:**
 
     ```sh
+    golangci-lint run
     go build -tags=jsoniter -o company-data .
     ```
 
