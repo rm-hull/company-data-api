@@ -6,6 +6,9 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type testData struct {
@@ -40,18 +43,16 @@ func TestParseCSVWithHeader(t *testing.T) {
 		{Value: testData{Name: "Jane Doe", Age: 25}, LineNum: 2},
 	}
 
-	i := 0
+	var actual []Result[testData]
 	for result := range results {
-		if result.Error != nil {
-			t.Errorf("unexpected error: %v", result.Error)
-		}
-		if result.Value != expected[i].Value {
-			t.Errorf("expected value %v, got %v", expected[i].Value, result.Value)
-		}
-		if result.LineNum != expected[i].LineNum {
-			t.Errorf("expected line number %d, got %d", expected[i].LineNum, result.LineNum)
-		}
-		i++
+		actual = append(actual, result)
+	}
+
+	require.Len(t, actual, len(expected))
+	for i := range expected {
+		require.NoError(t, actual[i].Error)
+		assert.Equal(t, expected[i].Value, actual[i].Value)
+		assert.Equal(t, expected[i].LineNum, actual[i].LineNum)
 	}
 }
 
