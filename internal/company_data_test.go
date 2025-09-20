@@ -280,6 +280,7 @@ func TestImportCompanyData(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
+	mock.ExpectPrepare(InsertCompanyDataSQL)
 	mock.ExpectExec(InsertCompanyDataSQL).
 		WithArgs(
 			"company0", "1234560", "", "", "address1", "address2", "posttown", "county",
@@ -290,6 +291,7 @@ func TestImportCompanyData(t *testing.T) {
 			1, 1, 1, 1, "sic1", "sic2", "sic3", "sic4", 1, 1, "uri",
 			sqlmock.AnyArg(), sqlmock.AnyArg(),
 		).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectCommit()
 	err = ImportCompanyData(zipPath, db)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -311,6 +313,7 @@ func TestProcessCompanyDataCSV(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
+	mock.ExpectPrepare(InsertCompanyDataSQL)
 	mock.ExpectExec(InsertCompanyDataSQL).
 		WithArgs(
 			"company0", "1234560", "", "", "address1", "address2", "posttown", "county",
@@ -344,6 +347,7 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
+	mock.ExpectPrepare(InsertCompanyDataSQL)
 	for i := 0; i < numRecords; i++ {
 		mock.ExpectExec(InsertCompanyDataSQL).
 			WithArgs(
@@ -355,9 +359,14 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 				1, 1, 1, 1, "sic1", "sic2", "sic3", "sic4", 1, 1, "uri",
 				sqlmock.AnyArg(), sqlmock.AnyArg(),
 			).WillReturnResult(sqlmock.NewResult(1, 1))
+		if (i+1)%batchSize == 0 {
+			mock.ExpectCommit()
+			mock.ExpectBegin()
+			mock.ExpectPrepare(InsertCompanyDataSQL)
+		}
 	}
+	mock.ExpectCommit()
 	err = processCompanyDataCSV(r.File[0], db)
 	assert.NoError(t, err)
-	mock.ExpectCommit()
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
