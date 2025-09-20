@@ -14,12 +14,17 @@ type CodePoint struct {
 	Northing int    `json:"northing"`
 }
 
-func fromCodePointCSV(record []string, headers []string) (CodePoint, error) {
+func fromCodePointCSV(record []string, headers []string) (*CodePoint, error) {
+	easting, err := parseInt(record[2])
+	if err != nil {
+		return nil, err
+	}
+	northing, err := parseInt(record[3])
+	if err != nil {
+		return nil, err
+	}
 
-	easting := parseInt(record[2])
-	northing := parseInt(record[3])
-
-	return CodePoint{
+	return &CodePoint{
 		PostCode: record[0],
 		Easting:  easting,
 		Northing: northing,
@@ -84,7 +89,7 @@ func processCodePointCSV(f *zip.File, stmt *sql.Stmt) error {
 			return fmt.Errorf("error parsing line %d: %w", result.LineNum, result.Error)
 		}
 
-		_, err := stmt.Exec(codePointToTuple(result.Value)...)
+		_, err := stmt.Exec(codePointToTuple(*result.Value)...)
 		if err != nil {
 			return fmt.Errorf("failed to insert code point for line %d: %w", result.LineNum, err)
 		}

@@ -36,9 +36,4 @@ company-data*
 data/codepo_gb.zip
 data/companies_data.db*
 data/BasicCompanyDataAsOneFile-2025-06-01.zip
-
-# gemini-cli settings
-.gemini/
-
-# GitHub App credentials
-gha-creds-*.json
+test-reports/
