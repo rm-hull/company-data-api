@@ -129,18 +129,9 @@ func companyDataToTuple(companyData models.CompanyData) []any {
 	}
 }
 
+const batchSize = 5000
+
 func ImportCompanyData(zipPath string, db *sql.DB) error {
-
-	stmt, err := db.Prepare(InsertCompanyDataSQL)
-	if err != nil {
-		return fmt.Errorf("failed to prepare statement: %w", err)
-	}
-	defer func() {
-		if err := stmt.Close(); err != nil {
-			log.Printf("error closing statement: %v", err)
-		}
-	}()
-
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)
@@ -152,7 +143,7 @@ func ImportCompanyData(zipPath string, db *sql.DB) error {
 	}()
 
 	for _, f := range r.File {
-		if err := processCompanyDataCSV(f, stmt); err != nil {
+		if err := processCompanyDataCSV(f, db); err != nil {
 			return fmt.Errorf("failed to process CSV data: %w", err)
 		}
 	}
@@ -160,7 +151,7 @@ func ImportCompanyData(zipPath string, db *sql.DB) error {
 	return nil
 }
 
-func processCompanyDataCSV(f *zip.File, stmt *sql.Stmt) error {
+func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 	r, err := f.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
@@ -171,23 +162,65 @@ func processCompanyDataCSV(f *zip.File, stmt *sql.Stmt) error {
 		}
 	}()
 
+	var (
+		batch   []models.CompanyData
+		lineNum int
+	)
+
 	for result := range parseCSV(r, true, fromCompanyDataCSV) {
-
+		lineNum = result.LineNum
 		if result.Error != nil {
-			return fmt.Errorf("error parsing line %d: %w", result.LineNum, result.Error)
+			return fmt.Errorf("error parsing line %d: %w", lineNum, result.Error)
 		}
 
-		companyData := result.Value
+		batch = append(batch, result.Value)
 
-		_, err := stmt.Exec(companyDataToTuple(companyData)...)
-		if err != nil {
-			return fmt.Errorf("failed to insert company data for line %d: %w", result.LineNum, err)
-		}
-
-		if result.LineNum%379 == 0 {
-			log.Printf("Inserted %d records...", result.LineNum)
+		if len(batch) >= batchSize {
+			if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {
+				return fmt.Errorf("failed to insert company data batch at line %d: %w", lineNum, err)
+			}
+			batch = nil // Clear the buffer
 		}
 	}
 
+	// Insert any remaining records in the buffer
+	if len(batch) > 0 {
+		if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {
+			return fmt.Errorf("failed to insert final company data batch at line %d: %w", lineNum, err)
+		}
+	}
+
+	return nil
+}
+
+func insertCompanyDataBatch(db *sql.DB, batch []models.CompanyData, lastLineNum int) error {
+	if len(batch) == 0 {
+		return nil
+	}
+
+	tx, err := db.Begin()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer func() {
+		if err != nil {
+			if rbErr := tx.Rollback(); rbErr != nil {
+				log.Printf("error rolling back transaction: %v", rbErr)
+			}
+		}
+	}()
+
+	for _, companyData := range batch {
+		_, err = tx.Exec(InsertCompanyDataSQL, companyDataToTuple(companyData)...)
+		if err != nil {
+			return fmt.Errorf("failed to execute individual insert: %w", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	log.Printf("Inserted %d records...", lastLineNum)
 	return nil
 }
