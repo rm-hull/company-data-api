@@ -370,3 +370,28 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestInsertCompanyDataBatchRollbackOnError(t *testing.T) {
+	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	assert.NoError(t, err)
+
+	// Prepare a batch of company data
+	batch := []models.CompanyData{
+		{CompanyNumber: "1", CompanyName: "Company One"},
+		{CompanyNumber: "2", CompanyName: "Company Two"},
+	}
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(InsertCompanyDataSQL)
+	mock.ExpectExec(InsertCompanyDataSQL).
+		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec(InsertCompanyDataSQL).
+		WillReturnError(fmt.Errorf("mock insert error"))
+	mock.ExpectRollback()
+
+	err = insertCompanyDataBatch(db, batch, 2) // lastLineNum doesn't matter much here
+
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to execute individual insert: mock insert error")
+	assert.NoError(t, mock.ExpectationsWereMet())
+}
