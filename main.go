@@ -36,7 +36,7 @@ func main() {
 			cmd.ImportCompaniesHouseZipFile(companiesHouseZipFile, dbPath)
 		},
 	}
-	processCompaniesHouseZipCmd.Flags().StringVar(&companiesHouseZipFile, "zip-file", "./data/BasicCompanyDataAsOneFile-2025-07-01.zip", "Path to Companies House .zip file")
+	processCompaniesHouseZipCmd.Flags().StringVar(&companiesHouseZipFile, "zip-file", "./data/BasicCompanyDataAsOneFile-2025-09-01.zip", "Path to Companies House .zip file")
 
 	processCodepointZipCmd := &cobra.Command{
 		Use:   "import-code-point [--zip-file <path>] [--db <path>]",
