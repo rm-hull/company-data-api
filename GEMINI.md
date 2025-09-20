@@ -42,7 +42,7 @@ To build and run the project using Docker, you will need to have Docker installe
 2.  **Run the Docker container:**
 
     ```sh
-    docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api http
+    docker run -p 8080:8080 -v $PWD/data:/app/data company-data-api api-server
     ```
 
 ## Development Conventions
