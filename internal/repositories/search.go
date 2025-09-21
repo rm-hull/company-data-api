@@ -26,7 +26,7 @@ type SearchRepository interface {
 
 type SqliteDbRepository struct {
 	findStmt    *sql.Stmt
-	lastUpdated *atomic.Value
+	lastUpdated atomic.Value
 }
 
 func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
@@ -43,7 +43,7 @@ func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
 			log.Printf("failed to obtain last updated date: %v", err)
 		}
 		repo.lastUpdated.Store(lastUpdated)
-		log.Printf("Last updated: %s", lastUpdated)
+		log.Printf("Company data last updated: %s", lastUpdated)
 	}()
 
 	return &repo, nil
