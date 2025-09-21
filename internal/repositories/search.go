@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/rm-hull/company-data-api/internal"
@@ -25,7 +26,7 @@ type SearchRepository interface {
 
 type SqliteDbRepository struct {
 	findStmt    *sql.Stmt
-	lastUpdated *time.Time
+	lastUpdated *atomic.Value
 }
 
 func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
@@ -41,7 +42,7 @@ func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
 		if err != nil {
 			log.Printf("failed to obtain last updated date: %v", err)
 		}
-		repo.lastUpdated = lastUpdated
+		repo.lastUpdated.Store(lastUpdated)
 		log.Printf("Last updated: %s", lastUpdated)
 	}()
 
@@ -129,7 +130,7 @@ func (repo *SqliteDbRepository) Find(bbox []float64, rowProcessor func(companyDa
 }
 
 func (repo *SqliteDbRepository) LastUpdated() *time.Time {
-	return repo.lastUpdated
+	return repo.lastUpdated.Load().(*time.Time)
 }
 
 func getLastUpdated(db *sql.DB) (*time.Time, error) {
