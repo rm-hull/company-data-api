@@ -17,6 +17,9 @@ var InsertCodePointSQL string
 //go:embed sql/insert_company_data.sql
 var InsertCompanyDataSQL string
 
+//go:embed sql/search.sql
+var SearchSQL string
+
 type Mode int
 
 const (

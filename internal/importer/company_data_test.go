@@ -11,7 +11,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/rm-hull/company-data-api/internal"
-	"github.com/rm-hull/company-data-api/models"
+	"github.com/rm-hull/company-data-api/internal/models"
 	"github.com/stretchr/testify/assert"
 )
 

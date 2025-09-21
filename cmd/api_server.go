@@ -13,7 +13,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/rm-hull/company-data-api/docs"
 	"github.com/rm-hull/company-data-api/internal"
-	"github.com/rm-hull/company-data-api/repositories"
+	repo "github.com/rm-hull/company-data-api/internal/repositories"
+	"github.com/rm-hull/company-data-api/internal/routes"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	healthcheck "github.com/tavsec/gin-healthcheck"
@@ -38,7 +39,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 		}
 	}()
 
-	repo, err := repositories.NewSqliteDbRepository(db)
+	repo, err := repo.NewSqliteDbRepository(db)
 	if err != nil {
 		log.Fatalf("failed to initialize repository: %v", err)
 	}
@@ -78,8 +79,8 @@ func ApiServer(dbPath string, port int, debug bool) {
 	}
 
 	v1 := r.Group("/v1/company-data")
-	v1.GET("/search", internal.Search(repo))
-	v1.GET("/search/by-postcode", internal.GroupByPostcode(repo))
+	v1.GET("/search", routes.Search(repo))
+	v1.GET("/search/by-postcode", routes.GroupByPostcode(repo))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	addr := fmt.Sprintf(":%d", port)
