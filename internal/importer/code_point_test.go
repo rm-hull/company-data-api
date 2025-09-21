@@ -128,12 +128,14 @@ func TestImportCodePoint(t *testing.T) {
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
+	mock.ExpectExec("ANALYZE code_point").
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err = codePoint.Import(zipPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
-	assert.Contains(t, buf.String(), "Total records imported: 1")
+	assert.Contains(t, buf.String(), "Completed successfully: 1 records imported")
 }
 
 func TestImportCodePointMultipleRecords(t *testing.T) {
@@ -163,12 +165,14 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 			WillReturnResult(sqlmock.NewResult(1, 1))
 	}
 	mock.ExpectCommit()
+	mock.ExpectExec("ANALYZE code_point").
+		WillReturnResult(sqlmock.NewResult(1, 1))
 
 	err = codePoint.Import(zipPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
-	assert.Contains(t, buf.String(), fmt.Sprintf("Total records imported: %d", numRecords))
+	assert.Contains(t, buf.String(), fmt.Sprintf("Completed successfully: %d records imported", numRecords))
 }
 
 func TestImportCodePointPrepareError(t *testing.T) {
