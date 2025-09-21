@@ -18,7 +18,7 @@ func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
 		}
 	}()
 
-	err = importer.ImportCompanyData(zipFile, db)
+	err = importer.NewCompanyDataImporter(db).Import(zipFile)
 	if err != nil {
 		log.Fatalf("failed to import company data: %v", err)
 	}
