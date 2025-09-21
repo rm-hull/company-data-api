@@ -21,7 +21,7 @@
             "args": [
                 "import-companies-house",
                 "--zip-file",
-                "https://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-2025-09-01.zip"
+                "https://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-{{yyyy}}-{{mm}}-01.zip"
             ]
         },
         {
