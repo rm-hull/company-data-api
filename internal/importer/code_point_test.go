@@ -1,4 +1,4 @@
-package internal
+package importer
 
 import (
 	"archive/zip"
@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/rm-hull/company-data-api/internal"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -120,8 +121,8 @@ func TestImportCodePoint(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCodePointSQL)
-	mock.ExpectExec(InsertCodePointSQL).
+	mock.ExpectPrepare(internal.InsertCodePointSQL)
+	mock.ExpectExec(internal.InsertCodePointSQL).
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
@@ -151,9 +152,9 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCodePointSQL)
+	mock.ExpectPrepare(internal.InsertCodePointSQL)
 	for i := 0; i < numRecords; i++ {
-		mock.ExpectExec(InsertCodePointSQL).
+		mock.ExpectExec(internal.InsertCodePointSQL).
 			WithArgs(fmt.Sprintf("AB12 3CD%d", i), 300000+i, 700000+i).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 	}
@@ -176,7 +177,7 @@ func TestImportCodePointPrepareError(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCodePointSQL).WillReturnError(fmt.Errorf("prepare error"))
+	mock.ExpectPrepare(internal.InsertCodePointSQL).WillReturnError(fmt.Errorf("prepare error"))
 	mock.ExpectRollback()
 
 	err = ImportCodePoint(zipPath, db)
@@ -195,8 +196,8 @@ func TestImportCodePointExecError(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCodePointSQL)
-	mock.ExpectExec(InsertCodePointSQL).
+	mock.ExpectPrepare(internal.InsertCodePointSQL)
+	mock.ExpectExec(internal.InsertCodePointSQL).
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnError(fmt.Errorf("exec error"))
 	mock.ExpectRollback()
@@ -223,8 +224,8 @@ func TestProcessCodePointCSV(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCodePointSQL)
-	mock.ExpectExec(InsertCodePointSQL).
+	mock.ExpectPrepare(internal.InsertCodePointSQL)
+	mock.ExpectExec(internal.InsertCodePointSQL).
 		WithArgs("AB12 3CD0", 300000, 700000).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()

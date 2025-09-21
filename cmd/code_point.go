@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/rm-hull/company-data-api/internal"
+	"github.com/rm-hull/company-data-api/internal/importer"
 )
 
 func ImportCodepointZipFile(zipFile string, dbPath string) {
@@ -17,7 +18,7 @@ func ImportCodepointZipFile(zipFile string, dbPath string) {
 		}
 	}()
 
-	err = internal.ImportCodePoint(zipFile, db)
+	err = importer.ImportCodePoint(zipFile, db)
 	if err != nil {
 		log.Fatalf("failed to import code points: %v", err)
 	}
