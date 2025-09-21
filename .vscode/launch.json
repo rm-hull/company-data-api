@@ -18,7 +18,11 @@
             "request": "launch",
             "mode": "auto",
             "program": "main.go",
-            "args": ["import-companies-house"]
+            "args": [
+                "import-companies-house",
+                "--zip-file",
+                "https://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-2025-09-01.zip"
+            ]
         },
         {
             "name": "Import Codepoint zip file",
@@ -26,7 +30,11 @@
             "request": "launch",
             "mode": "auto",
             "program": "main.go",
-            "args": ["import-code-point"]
+            "args": [
+                "import-code-point",
+                "--zip-file",
+                "https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect"
+            ]
         }
     ]
 }

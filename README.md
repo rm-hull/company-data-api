@@ -137,18 +137,12 @@ The application uses [cobra](https://github.com/spf13/cobra) for its command-lin
 Example usage:
 
 ```sh
-./company-data import-companies-house --zip-file ./data/BasicCompanyDataAsOneFile-2025-09-01.zip
-./company-data import-code-point --zip-file ./data/codepo_gb.zip
+./company-data import-companies-house --zip-file https://download.companieshouse.gov.uk/BasicCompanyDataAsOneFile-2025-09-01.zip
+./company-data import-code-point --zip-file https://api.os.uk/downloads/v1/products/CodePointOpen/downloads?area=GB&format=CSV&redirect
 ./company-data api-server --db ./data/companies_data.db --port 8080
 ```
 
-### 1. Download Data
-
--   Download company data from [Companies House](https://download.companieshouse.gov.uk/en_output.html)
--   Download CodePoint Open from [OS Data Hub](https://osdatahub.os.uk/downloads/open/CodePointOpen)
--   Place both `.zip` files in the `./data` directory (do **not** decompress).
-
-### 2. Regenerate Swagger definitions
+### 1. Regenerate Swagger definitions
 
 Swagger/OpenAPI docs are generated from code comments. To update the docs after changing endpoints or annotations:
 
@@ -157,7 +151,7 @@ go install github.com/swaggo/swag/cmd/swag@latest
 swag init
 ```
 
-### 3. Build and Run
+### 2. Build and Run
 
 ```sh
 go build -tags=jsoniter -o company-data .

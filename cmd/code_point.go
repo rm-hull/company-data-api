@@ -18,7 +18,7 @@ func ImportCodepointZipFile(zipFile string, dbPath string) {
 		}
 	}()
 
-	err = importer.NewCodePointImporter(db).Import(zipFile)
+	err = internal.TransientDownload(zipFile, importer.NewCodePointImporter(db).Import)
 	if err != nil {
 		log.Fatalf("failed to import code points: %v", err)
 	}
