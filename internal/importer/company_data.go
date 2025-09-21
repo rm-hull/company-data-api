@@ -1,4 +1,4 @@
-package internal
+package importer
 
 import (
 	"archive/zip"
@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/rm-hull/company-data-api/internal"
 	"github.com/rm-hull/company-data-api/models"
 )
 
@@ -125,8 +126,6 @@ func companyDataToTuple(companyData models.CompanyData) []any {
 	}
 }
 
-const batchSize = 5000
-
 func ImportCompanyData(zipPath string, db *sql.DB) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
@@ -163,7 +162,9 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 		lineNum int
 	)
 
-	for result := range parseCSV(r, true, fromCompanyDataCSV) {
+	const batchSize = 5000
+
+	for result := range internal.ParseCSV(r, true, fromCompanyDataCSV) {
 		lineNum = result.LineNum
 		if result.Error != nil {
 			return fmt.Errorf("error parsing line %d: %w", lineNum, result.Error)
@@ -206,7 +207,7 @@ func insertCompanyDataBatch(db *sql.DB, batch []models.CompanyData, lastLineNum 
 		}
 	}()
 
-	stmt, err := tx.Prepare(InsertCompanyDataSQL)
+	stmt, err := tx.Prepare(internal.InsertCompanyDataSQL)
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %w", err)
 	}

@@ -1,4 +1,4 @@
-package internal
+package importer
 
 import (
 	"archive/zip"
@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/rm-hull/company-data-api/internal"
 	"github.com/rm-hull/company-data-api/models"
 	"github.com/stretchr/testify/assert"
 )
@@ -280,8 +281,8 @@ func TestImportCompanyData(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCompanyDataSQL)
-	mock.ExpectExec(InsertCompanyDataSQL).
+	mock.ExpectPrepare(internal.InsertCompanyDataSQL)
+	mock.ExpectExec(internal.InsertCompanyDataSQL).
 		WithArgs(
 			"company0", "1234560", "", "", "address1", "address2", "posttown", "county",
 			"country", "postcode", "category", "status", "origin",
@@ -313,8 +314,8 @@ func TestProcessCompanyDataCSV(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCompanyDataSQL)
-	mock.ExpectExec(InsertCompanyDataSQL).
+	mock.ExpectPrepare(internal.InsertCompanyDataSQL)
+	mock.ExpectExec(internal.InsertCompanyDataSQL).
 		WithArgs(
 			"company0", "1234560", "", "", "address1", "address2", "posttown", "county",
 			"country", "postcode", "category", "status", "origin",
@@ -334,6 +335,8 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
 
+	batchSize := 5000
+
 	numRecords := batchSize*2 + 1 // More than two batches
 	zipPath := createTestZip(t, numRecords)
 	defer func() {
@@ -347,9 +350,9 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	}()
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCompanyDataSQL)
+	mock.ExpectPrepare(internal.InsertCompanyDataSQL)
 	for i := 0; i < numRecords; i++ {
-		mock.ExpectExec(InsertCompanyDataSQL).
+		mock.ExpectExec(internal.InsertCompanyDataSQL).
 			WithArgs(
 				fmt.Sprintf("company%d", i), fmt.Sprintf("123456%d", i), "", "", "address1", "address2", "posttown", "county",
 				"country", "postcode", "category", "status", "origin",
@@ -362,7 +365,7 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 		if (i+1)%batchSize == 0 {
 			mock.ExpectCommit()
 			mock.ExpectBegin()
-			mock.ExpectPrepare(InsertCompanyDataSQL)
+			mock.ExpectPrepare(internal.InsertCompanyDataSQL)
 		}
 	}
 	mock.ExpectCommit()
@@ -382,10 +385,10 @@ func TestInsertCompanyDataBatchRollbackOnError(t *testing.T) {
 	}
 
 	mock.ExpectBegin()
-	mock.ExpectPrepare(InsertCompanyDataSQL)
-	mock.ExpectExec(InsertCompanyDataSQL).
+	mock.ExpectPrepare(internal.InsertCompanyDataSQL)
+	mock.ExpectExec(internal.InsertCompanyDataSQL).
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	mock.ExpectExec(InsertCompanyDataSQL).
+	mock.ExpectExec(internal.InsertCompanyDataSQL).
 		WillReturnError(fmt.Errorf("mock insert error"))
 	mock.ExpectRollback()
 

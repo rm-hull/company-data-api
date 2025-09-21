@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/rm-hull/company-data-api/internal"
+	"github.com/rm-hull/company-data-api/internal/importer"
 )
 
 func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
@@ -17,7 +18,7 @@ func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
 		}
 	}()
 
-	err = internal.ImportCompanyData(zipFile, db)
+	err = importer.ImportCompanyData(zipFile, db)
 	if err != nil {
 		log.Fatalf("failed to import company data: %v", err)
 	}

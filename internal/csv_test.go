@@ -36,7 +36,7 @@ func TestParseCSVWithHeader(t *testing.T) {
 "Jane Doe",25
 `
 	reader := strings.NewReader(csvData)
-	results := parseCSV(reader, true, fromFunc)
+	results := ParseCSV(reader, true, fromFunc)
 
 	expected := []Result[testData]{
 		{Value: testData{Name: "John Doe", Age: 30}, LineNum: 1},
@@ -61,7 +61,7 @@ func TestParseCSVWithoutHeader(t *testing.T) {
 "Jane Doe",25
 `
 	reader := strings.NewReader(csvData)
-	results := parseCSV(reader, false, fromFunc)
+	results := ParseCSV(reader, false, fromFunc)
 
 	expected := []Result[testData]{
 		{Value: testData{Name: "John Doe", Age: 30}, LineNum: 1},
@@ -87,7 +87,7 @@ func TestParseCSVMalformed(t *testing.T) {
 "Jane Doe",25,extra
 `
 	reader := strings.NewReader(csvData)
-	results := parseCSV(reader, true, fromFunc)
+	results := ParseCSV(reader, true, fromFunc)
 
 	var resultsSlice []Result[testData]
 	for result := range results {
@@ -111,7 +111,7 @@ func TestParseCSVEmpty(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			reader := strings.NewReader("")
-			results := parseCSV(reader, tc.withHeader, fromFunc)
+			results := ParseCSV(reader, tc.withHeader, fromFunc)
 
 			var resultsSlice []Result[testData]
 			for result := range results {
@@ -134,7 +134,7 @@ func TestParseCSVFromFuncError(t *testing.T) {
 	fromFuncErr := func(data []string, headers []string) (testData, error) {
 		return testData{}, errors.New("test error")
 	}
-	results := parseCSV(reader, true, fromFuncErr)
+	results := ParseCSV(reader, true, fromFuncErr)
 
 	var resultsSlice []Result[testData]
 	for result := range results {

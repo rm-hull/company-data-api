@@ -1,4 +1,4 @@
-package internal
+package importer
 
 import (
 	"archive/zip"
@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
+
+	"github.com/rm-hull/company-data-api/internal"
 )
 
 type CodePoint struct {
@@ -83,7 +85,7 @@ func insertCodePointBatch(db *sql.DB, batch []CodePoint) error {
 		}
 	}()
 
-	stmt, err := tx.Prepare(InsertCodePointSQL)
+	stmt, err := tx.Prepare(internal.InsertCodePointSQL)
 	if err != nil {
 		return fmt.Errorf("failed to prepare statement: %w", err)
 	}
@@ -121,7 +123,7 @@ func processCodePointCSV(f *zip.File, db *sql.DB) (int, error) {
 	lineNum := 0
 
 	const batchSize = 5000
-	for result := range parseCSV(r, false, fromCodePointCSV) {
+	for result := range internal.ParseCSV(r, false, fromCodePointCSV) {
 		lineNum = result.LineNum
 		if result.Error != nil {
 			return 0, fmt.Errorf("error parsing line %d: %w", lineNum, result.Error)
