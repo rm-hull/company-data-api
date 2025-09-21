@@ -19,11 +19,12 @@ func applyDateTemplate(uri string) string {
 	mm := now.Format("01")
 	dd := now.Format("02")
 
-	uri = strings.ReplaceAll(uri, "{{yyyy}}", yyyy)
-	uri = strings.ReplaceAll(uri, "{{mm}}", mm)
-	uri = strings.ReplaceAll(uri, "{{dd}}", dd)
-
-	return uri
+	r := strings.NewReplacer(
+		"{{yyyy}}", yyyy,
+		"{{mm}}", mm,
+		"{{dd}}", dd,
+	)
+	return r.Replace(uri)
 }
 
 func isValidUrl(uri string) bool {
