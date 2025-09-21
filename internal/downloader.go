@@ -7,10 +7,24 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dustin/go-humanize"
 )
+
+func applyDateTemplate(uri string) string {
+	now := time.Now()
+	yyyy := now.Format("2006")
+	mm := now.Format("01")
+	dd := now.Format("02")
+
+	uri = strings.ReplaceAll(uri, "{{yyyy}}", yyyy)
+	uri = strings.ReplaceAll(uri, "{{mm}}", mm)
+	uri = strings.ReplaceAll(uri, "{{dd}}", dd)
+
+	return uri
+}
 
 func isValidUrl(uri string) bool {
 	u, err := url.Parse(uri)
@@ -18,6 +32,7 @@ func isValidUrl(uri string) bool {
 }
 
 func TransientDownload(uri string, handler func(tmpfile string) error) error {
+	uri = applyDateTemplate(uri)
 	if !isValidUrl(uri) {
 		return handler(uri)
 	}
@@ -41,7 +56,7 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 	}()
 
 	if resp.StatusCode > 299 {
-		return fmt.Errorf("http status response from %s: %s", uri, resp.Status)
+		return fmt.Errorf("error response from %s: %s", uri, resp.Status)
 	}
 
 	tmp, err := os.CreateTemp("", "download-*")
