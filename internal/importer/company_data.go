@@ -126,7 +126,19 @@ func companyDataToTuple(companyData models.CompanyData) []any {
 	}
 }
 
-func ImportCompanyData(zipPath string, db *sql.DB) error {
+type companyDataImporter struct {
+	batchSize int
+	db        *sql.DB
+}
+
+func NewCompanyDataImporter(db *sql.DB) *companyDataImporter {
+	return &companyDataImporter{
+		batchSize: 5000,
+		db:        db,
+	}
+}
+
+func (importer *companyDataImporter) Import(zipPath string) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)
@@ -138,7 +150,7 @@ func ImportCompanyData(zipPath string, db *sql.DB) error {
 	}()
 
 	for _, f := range r.File {
-		if err := processCompanyDataCSV(f, db); err != nil {
+		if err := importer.processCSV(f); err != nil {
 			return fmt.Errorf("failed to process CSV data: %w", err)
 		}
 	}
@@ -146,7 +158,7 @@ func ImportCompanyData(zipPath string, db *sql.DB) error {
 	return nil
 }
 
-func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
+func (importer *companyDataImporter) processCSV(f *zip.File) error {
 	r, err := f.Open()
 	if err != nil {
 		return fmt.Errorf("failed to open embedded file %s in zip: %w", f.Name, err)
@@ -157,12 +169,8 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 		}
 	}()
 
-	var (
-		batch   []models.CompanyData
-		lineNum int
-	)
-
-	const batchSize = 5000
+	batch := make([]models.CompanyData, 0, importer.batchSize)
+	lineNum := 0
 
 	for result := range internal.ParseCSV(r, true, fromCompanyDataCSV) {
 		lineNum = result.LineNum
@@ -172,8 +180,8 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 
 		batch = append(batch, *result.Value)
 
-		if len(batch) >= batchSize {
-			if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {
+		if len(batch) >= importer.batchSize {
+			if err := importer.insertBatch(batch, lineNum); err != nil {
 				return fmt.Errorf("failed to insert company data batch at line %d: %w", lineNum, err)
 			}
 			batch = batch[:0] // Clear the buffer, retaining capacity
@@ -182,7 +190,7 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 
 	// Insert any remaining records in the buffer
 	if len(batch) > 0 {
-		if err := insertCompanyDataBatch(db, batch, lineNum); err != nil {
+		if err := importer.insertBatch(batch, lineNum); err != nil {
 			return fmt.Errorf("failed to insert final company data batch at line %d: %w", lineNum, err)
 		}
 	}
@@ -190,12 +198,12 @@ func processCompanyDataCSV(f *zip.File, db *sql.DB) error {
 	return nil
 }
 
-func insertCompanyDataBatch(db *sql.DB, batch []models.CompanyData, lastLineNum int) error {
+func (importer *companyDataImporter) insertBatch(batch []models.CompanyData, lastLineNum int) error {
 	if len(batch) == 0 {
 		return nil
 	}
 
-	tx, err := db.Begin()
+	tx, err := importer.db.Begin()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
