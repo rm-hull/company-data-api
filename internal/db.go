@@ -20,31 +20,19 @@ var InsertCompanyDataSQL string
 //go:embed sql/search.sql
 var SearchSQL string
 
-type Mode int
-
-const (
-	ReadOnly Mode = iota
-	ReadWrite
-)
-
 func CreateDB(db *sql.DB) error {
 	_, err := db.Exec(migrationSQL)
 	return err
 }
 
-func Connect(dbPath string, mode Mode) (*sql.DB, error) {
+func Connect(dbPath string) (*sql.DB, error) {
 	dsn := dbPath
 	if strings.Contains(dsn, "?") {
 		dsn += "&"
 	} else {
 		dsn += "?"
 	}
-	queryParams := []string{"_busy_timeout=5000"}
-	if mode == ReadOnly {
-		queryParams = append(queryParams, "mode=ro")
-	} else {
-		queryParams = append(queryParams, "_journal_mode=WAL")
-	}
+	queryParams := []string{"_busy_timeout=5000", "_journal_mode=WAL"}
 	dsn += strings.Join(queryParams, "&")
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
@@ -56,11 +44,9 @@ func Connect(dbPath string, mode Mode) (*sql.DB, error) {
 	}
 	log.Printf("connected to database: %s", dsn)
 
-	if mode == ReadWrite {
-		err = CreateDB(db)
-		if err != nil {
-			return nil, fmt.Errorf("failed to create database: %w", err)
-		}
+	err = CreateDB(db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create database: %w", err)
 	}
 	return db, nil
 }

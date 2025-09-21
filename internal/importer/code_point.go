@@ -76,7 +76,12 @@ func (importer *codePointImporter) Import(zipPath string) error {
 		log.Printf("Processed file: %s (inserted %d records)", f.Name, recordsInFile)
 		totalRecordsImported += recordsInFile
 	}
-	log.Printf("Total records imported: %d", totalRecordsImported)
+
+	log.Printf("Completed successfully: %d records imported", totalRecordsImported)
+	log.Printf("Analyzing \"code_point\" table")
+	if _, err = importer.db.Exec("ANALYZE code_point"); err != nil {
+		return fmt.Errorf("failed to analyze \"code_point\" table: %w", err)
+	}
 	return nil
 }
 

@@ -3,7 +3,9 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/rm-hull/company-data-api/internal"
@@ -24,7 +26,7 @@ type SearchRepository interface {
 
 type SqliteDbRepository struct {
 	findStmt    *sql.Stmt
-	lastUpdated *time.Time
+	lastUpdated atomic.Value
 }
 
 func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
@@ -33,12 +35,18 @@ func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
 		return nil, fmt.Errorf("error preparing statement: %w", err)
 	}
 
-	lastUpdated, err := getLastUpdated(db)
-	if err != nil {
-		return nil, fmt.Errorf("error querying server: %w", err)
-	}
+	repo := SqliteDbRepository{findStmt: findStmt}
 
-	return &SqliteDbRepository{findStmt: findStmt, lastUpdated: lastUpdated}, nil
+	go func() {
+		lastUpdated, err := getLastUpdated(db)
+		if err != nil {
+			log.Printf("failed to obtain last updated date: %v", err)
+		}
+		repo.lastUpdated.Store(lastUpdated)
+		log.Printf("Company data last updated: %s", lastUpdated)
+	}()
+
+	return &repo, nil
 }
 
 func prepareStatement(db *sql.DB) (*sql.Stmt, error) {
@@ -122,7 +130,7 @@ func (repo *SqliteDbRepository) Find(bbox []float64, rowProcessor func(companyDa
 }
 
 func (repo *SqliteDbRepository) LastUpdated() *time.Time {
-	return repo.lastUpdated
+	return repo.lastUpdated.Load().(*time.Time)
 }
 
 func getLastUpdated(db *sql.DB) (*time.Time, error) {

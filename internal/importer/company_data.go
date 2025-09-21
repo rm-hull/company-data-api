@@ -155,6 +155,11 @@ func (importer *companyDataImporter) Import(zipPath string) error {
 		}
 	}
 
+	log.Printf("Import completed successfully!")
+	log.Printf("Analyzing \"company_data\" table")
+	if _, err = importer.db.Exec("ANALYZE company_data"); err != nil {
+		return fmt.Errorf("failed to analyze \"company_data\" table: %w", err)
+	}
 	return nil
 }
 

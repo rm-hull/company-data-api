@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/Depado/ginprom"
@@ -29,7 +30,7 @@ import (
 // @BasePath /v1/company-data
 func ApiServer(dbPath string, port int, debug bool) {
 
-	db, err := internal.Connect(dbPath, internal.ReadOnly)
+	db, err := internal.Connect(dbPath)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)
 	}
@@ -85,6 +86,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)
-	err = r.Run(addr)
-	log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
+	if err := r.Run(addr); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
+	}
 }

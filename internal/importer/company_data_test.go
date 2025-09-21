@@ -295,6 +295,8 @@ func TestImportCompanyData(t *testing.T) {
 			sqlmock.AnyArg(), sqlmock.AnyArg(),
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
+	mock.ExpectExec("ANALYZE company_data").
+		WillReturnResult(sqlmock.NewResult(1, 1))
 	err = companyData.Import(zipPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
