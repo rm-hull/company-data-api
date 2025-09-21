@@ -8,7 +8,7 @@ import (
 )
 
 func ImportCompaniesHouseZipFile(zipFile string, dbPath string) {
-	db, err := internal.Connect(dbPath, internal.ReadWrite)
+	db, err := internal.Connect(dbPath)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)
 	}

@@ -63,14 +63,13 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 		}
 	}()
 
-	if err := tmp.Close(); err != nil {
-		return fmt.Errorf("failed to close temporary file: %w", err)
-	}
-
 	if _, err := io.Copy(tmp, resp.Body); err != nil {
 		_ = tmp.Close()
 		return fmt.Errorf("failed to copy response body: %w", err)
 	}
 
+	if err := tmp.Close(); err != nil {
+		return fmt.Errorf("failed to close temporary file: %w", err)
+	}
 	return handler(tmpfile)
 }

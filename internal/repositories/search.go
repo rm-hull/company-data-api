@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -33,12 +34,18 @@ func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
 		return nil, fmt.Errorf("error preparing statement: %w", err)
 	}
 
-	lastUpdated, err := getLastUpdated(db)
-	if err != nil {
-		return nil, fmt.Errorf("error querying server: %w", err)
-	}
+	repo := SqliteDbRepository{findStmt: findStmt}
 
-	return &SqliteDbRepository{findStmt: findStmt, lastUpdated: lastUpdated}, nil
+	go func() {
+		lastUpdated, err := getLastUpdated(db)
+		if err != nil {
+			log.Printf("failed to obtain last updated date: %v", err)
+		}
+		repo.lastUpdated = lastUpdated
+		log.Printf("Last updated: %s", lastUpdated)
+	}()
+
+	return &repo, nil
 }
 
 func prepareStatement(db *sql.DB) (*sql.Stmt, error) {
