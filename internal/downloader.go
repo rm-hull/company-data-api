@@ -36,10 +36,13 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 		return fmt.Errorf("failed to fetch from %s: %w", uri, err)
 	}
 
-	if resp.StatusCode > 299 {
+	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Printf("failed to close body: %v", err)
 		}
+	}()
+
+	if resp.StatusCode > 299 {
 		return fmt.Errorf("http status response from %s: %s", uri, resp.Status)
 	}
 
