@@ -108,6 +108,8 @@ func TestImportCodePoint(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
 
+	codePoint := NewCodePointImporter(db)
+
 	zipPath := createTestZipCodePoint(t, 1) // Create a zip with 1 record
 	defer func() {
 		assert.NoError(t, os.Remove(zipPath))
@@ -127,7 +129,7 @@ func TestImportCodePoint(t *testing.T) {
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
-	err = ImportCodePoint(zipPath, db)
+	err = codePoint.Import(zipPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
@@ -137,6 +139,8 @@ func TestImportCodePoint(t *testing.T) {
 func TestImportCodePointMultipleRecords(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
+
+	codePoint := NewCodePointImporter(db)
 
 	numRecords := 3
 	zipPath := createTestZipCodePoint(t, numRecords)
@@ -160,7 +164,7 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 	}
 	mock.ExpectCommit()
 
-	err = ImportCodePoint(zipPath, db)
+	err = codePoint.Import(zipPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
@@ -171,6 +175,8 @@ func TestImportCodePointPrepareError(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
 
+	codePoint := NewCodePointImporter(db)
+
 	zipPath := createTestZipCodePoint(t, 1)
 	defer func() {
 		assert.NoError(t, os.Remove(zipPath))
@@ -180,7 +186,7 @@ func TestImportCodePointPrepareError(t *testing.T) {
 	mock.ExpectPrepare(internal.InsertCodePointSQL).WillReturnError(fmt.Errorf("prepare error"))
 	mock.ExpectRollback()
 
-	err = ImportCodePoint(zipPath, db)
+	err = codePoint.Import(zipPath)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to prepare statement: prepare error")
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -189,6 +195,8 @@ func TestImportCodePointPrepareError(t *testing.T) {
 func TestImportCodePointExecError(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
+
+	codePoint := NewCodePointImporter(db)
 
 	zipPath := createTestZipCodePoint(t, 1)
 	defer func() {
@@ -202,7 +210,7 @@ func TestImportCodePointExecError(t *testing.T) {
 		WillReturnError(fmt.Errorf("exec error"))
 	mock.ExpectRollback()
 
-	err = ImportCodePoint(zipPath, db)
+	err = codePoint.Import(zipPath)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to execute individual insert: exec error")
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -211,6 +219,8 @@ func TestImportCodePointExecError(t *testing.T) {
 func TestProcessCodePointCSV(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
+
+	codePoint := NewCodePointImporter(db)
 
 	zipPath := createTestZipCodePoint(t, 1) // Create a zip with 1 record
 	defer func() {
@@ -240,7 +250,7 @@ func TestProcessCodePointCSV(t *testing.T) {
 	}
 	assert.NotNil(t, csvFile, "CSV file not found in zip")
 
-	numRecords, err := processCodePointCSV(csvFile, db)
+	numRecords, err := codePoint.processCSV(csvFile)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 	assert.Equal(t, 1, numRecords)

@@ -275,6 +275,8 @@ func TestImportCompanyData(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
 
+	companyData := NewCompanyDataImporter(db)
+
 	zipPath := createTestZip(t, 1) // Create a zip with 1 record
 	defer func() {
 		assert.NoError(t, os.Remove(zipPath))
@@ -293,7 +295,7 @@ func TestImportCompanyData(t *testing.T) {
 			sqlmock.AnyArg(), sqlmock.AnyArg(),
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
-	err = ImportCompanyData(zipPath, db)
+	err = companyData.Import(zipPath)
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -301,6 +303,8 @@ func TestImportCompanyData(t *testing.T) {
 func TestProcessCompanyDataCSV(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
+
+	companyData := NewCompanyDataImporter(db)
 
 	zipPath := createTestZip(t, 1) // Create a zip with 1 record
 	defer func() {
@@ -326,7 +330,7 @@ func TestProcessCompanyDataCSV(t *testing.T) {
 			sqlmock.AnyArg(), sqlmock.AnyArg(),
 		).WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
-	err = processCompanyDataCSV(r.File[0], db)
+	err = companyData.processCSV(r.File[0])
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -335,9 +339,9 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
 
-	batchSize := 5000
+	companyData := NewCompanyDataImporter(db)
 
-	numRecords := batchSize*2 + 1 // More than two batches
+	numRecords := companyData.batchSize*2 + 1 // More than two batches
 	zipPath := createTestZip(t, numRecords)
 	defer func() {
 		assert.NoError(t, os.Remove(zipPath))
@@ -362,14 +366,14 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 				1, 1, 1, 1, "sic1", "sic2", "sic3", "sic4", 1, 1, "uri",
 				sqlmock.AnyArg(), sqlmock.AnyArg(),
 			).WillReturnResult(sqlmock.NewResult(1, 1))
-		if (i+1)%batchSize == 0 {
+		if (i+1)%companyData.batchSize == 0 {
 			mock.ExpectCommit()
 			mock.ExpectBegin()
 			mock.ExpectPrepare(internal.InsertCompanyDataSQL)
 		}
 	}
 	mock.ExpectCommit()
-	err = processCompanyDataCSV(r.File[0], db)
+	err = companyData.processCSV(r.File[0])
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
@@ -377,6 +381,8 @@ func TestProcessCompanyDataCSVBatching(t *testing.T) {
 func TestInsertCompanyDataBatchRollbackOnError(t *testing.T) {
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	assert.NoError(t, err)
+
+	companyData := NewCompanyDataImporter(db)
 
 	// Prepare a batch of company data
 	batch := []models.CompanyData{
@@ -392,7 +398,7 @@ func TestInsertCompanyDataBatchRollbackOnError(t *testing.T) {
 		WillReturnError(fmt.Errorf("mock insert error"))
 	mock.ExpectRollback()
 
-	err = insertCompanyDataBatch(db, batch, 2) // lastLineNum doesn't matter much here
+	err = companyData.insertBatch(batch, 2) // lastLineNum doesn't matter much here
 
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to execute individual insert: mock insert error")

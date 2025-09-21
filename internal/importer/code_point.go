@@ -94,7 +94,6 @@ func (importer *codePointImporter) processCSV(f *zip.File) (int, error) {
 	batch := make([]CodePoint, 0, importer.batchSize)
 	lineNum := 0
 
-	const batchSize = 5000
 	for result := range internal.ParseCSV(r, false, fromCodePointCSV) {
 		lineNum = result.LineNum
 		if result.Error != nil {
