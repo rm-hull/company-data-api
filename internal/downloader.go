@@ -28,7 +28,7 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: 5 * time.Minute}
 	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to fetch from %s: %w", uri, err)
@@ -63,13 +63,12 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 		}
 	}()
 
-	defer func() {
-		if err := tmp.Close(); err != nil {
-			log.Printf("failed to close temporary file: %v", err)
-		}
-	}()
+	if err := tmp.Close(); err != nil {
+		return fmt.Errorf("failed to close temporary file: %w", err)
+	}
 
 	if _, err := io.Copy(tmp, resp.Body); err != nil {
+		_ = tmp.Close()
 		return fmt.Errorf("failed to copy response body: %w", err)
 	}
 
