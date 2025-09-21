@@ -1,4 +1,4 @@
-package internal
+package routes
 
 import (
 	"fmt"
@@ -9,8 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rm-hull/company-data-api/models"
-	repo "github.com/rm-hull/company-data-api/repositories"
+	"github.com/rm-hull/company-data-api/internal"
+	"github.com/rm-hull/company-data-api/internal/models"
+	repo "github.com/rm-hull/company-data-api/internal/repositories"
 
 	"github.com/gin-gonic/gin"
 )
@@ -62,7 +63,7 @@ func Search(repo repo.SearchRepository) func(c *gin.Context) {
 
 		c.JSON(http.StatusOK, SearchResponse{
 			Results:     results,
-			Attribution: ATTRIBUTION,
+			Attribution: internal.ATTRIBUTION,
 			LastUpdated: repo.LastUpdated(),
 		})
 	}
@@ -103,7 +104,7 @@ func GroupByPostcode(repo repo.SearchRepository) func(c *gin.Context) {
 
 		c.JSON(http.StatusOK, GroupedSearchResponse{
 			Results:     results,
-			Attribution: ATTRIBUTION,
+			Attribution: internal.ATTRIBUTION,
 			LastUpdated: repo.LastUpdated(),
 		})
 	}
