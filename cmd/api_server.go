@@ -16,6 +16,7 @@ import (
 	"github.com/rm-hull/company-data-api/internal"
 	repo "github.com/rm-hull/company-data-api/internal/repositories"
 	"github.com/rm-hull/company-data-api/internal/routes"
+	"github.com/rm-hull/godx"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	healthcheck "github.com/tavsec/gin-healthcheck"
@@ -29,6 +30,10 @@ import (
 // @description A fast REST API for querying UK company data by geographic bounding box, built with Go, SQLite, and Gin. It imports official datasets from Companies House and Ordnance Survey CodePoint Open, providing spatial search capabilities for company records.
 // @BasePath /v1/company-data
 func ApiServer(dbPath string, port int, debug bool) {
+
+	godx.GitVersion()
+	godx.EnvironmentVars()
+	godx.UserInfo()
 
 	db, err := internal.Connect(dbPath)
 	if err != nil {

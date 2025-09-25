@@ -5,9 +5,15 @@ import (
 
 	"github.com/rm-hull/company-data-api/internal"
 	"github.com/rm-hull/company-data-api/internal/importer"
+	"github.com/rm-hull/godx"
 )
 
 func ImportCodepointZipFile(zipFile string, dbPath string) {
+
+	godx.GitVersion()
+	godx.EnvironmentVars()
+	godx.UserInfo()
+
 	db, err := internal.Connect(dbPath)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)

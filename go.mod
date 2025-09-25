@@ -1,6 +1,6 @@
 module github.com/rm-hull/company-data-api
 
-go 1.25
+go 1.25.1
 
 require (
 	github.com/Depado/ginprom v1.8.1
@@ -18,24 +18,29 @@ require (
 )
 
 require (
+	github.com/earthboundkid/versioninfo/v2 v2.24.1 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
+)
+
+require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-openapi/swag/cmdutils v0.24.0 // indirect
-	github.com/go-openapi/swag/conv v0.24.0 // indirect
-	github.com/go-openapi/swag/fileutils v0.24.0 // indirect
-	github.com/go-openapi/swag/jsonname v0.24.0 // indirect
-	github.com/go-openapi/swag/jsonutils v0.24.0 // indirect
-	github.com/go-openapi/swag/loading v0.24.0 // indirect
-	github.com/go-openapi/swag/mangling v0.24.0 // indirect
-	github.com/go-openapi/swag/netutils v0.24.0 // indirect
-	github.com/go-openapi/swag/stringutils v0.24.0 // indirect
-	github.com/go-openapi/swag/typeutils v0.24.0 // indirect
-	github.com/go-openapi/swag/yamlutils v0.24.0 // indirect
+	github.com/go-openapi/swag/cmdutils v0.25.0 // indirect
+	github.com/go-openapi/swag/conv v0.25.0 // indirect
+	github.com/go-openapi/swag/fileutils v0.25.0 // indirect
+	github.com/go-openapi/swag/jsonname v0.25.0 // indirect
+	github.com/go-openapi/swag/jsonutils v0.25.0 // indirect
+	github.com/go-openapi/swag/loading v0.25.0 // indirect
+	github.com/go-openapi/swag/mangling v0.25.0 // indirect
+	github.com/go-openapi/swag/netutils v0.25.0 // indirect
+	github.com/go-openapi/swag/stringutils v0.25.0 // indirect
+	github.com/go-openapi/swag/typeutils v0.25.0 // indirect
+	github.com/go-openapi/swag/yamlutils v0.25.0 // indirect
 	github.com/goccy/go-yaml v1.18.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
-	github.com/quic-go/quic-go v0.54.0 // indirect
+	github.com/quic-go/quic-go v0.54.1 // indirect
 	go.uber.org/mock v0.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 )
@@ -57,7 +62,7 @@ require (
 	github.com/go-openapi/jsonpointer v0.22.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.1 // indirect
 	github.com/go-openapi/spec v0.21.0 // indirect
-	github.com/go-openapi/swag v0.24.1 // indirect
+	github.com/go-openapi/swag v0.25.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
@@ -67,12 +72,10 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0 // indirect
 	github.com/influxdata/line-protocol v0.0.0-20210922203350-b1ad95c89adf // indirect
-	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/mailru/easyjson v0.9.1 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -86,6 +89,7 @@ require (
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/redis/go-redis/v9 v9.14.0 // indirect
+	github.com/rm-hull/godx v0.0.2
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.0 // indirect
