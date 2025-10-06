@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/csv"
 	"fmt"
+	"net/http"
 
 	"os"
 	"testing"
@@ -297,7 +298,7 @@ func TestImportCompanyData(t *testing.T) {
 	mock.ExpectCommit()
 	mock.ExpectExec("ANALYZE company_data").
 		WillReturnResult(sqlmock.NewResult(1, 1))
-	err = companyData.Import(zipPath)
+	err = companyData.Import(zipPath, http.Header{})
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 }

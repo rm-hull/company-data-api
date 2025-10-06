@@ -32,10 +32,10 @@ func isValidUrl(uri string) bool {
 	return err == nil && (u.Scheme == "http" || u.Scheme == "https")
 }
 
-func TransientDownload(uri string, handler func(tmpfile string) error) error {
+func TransientDownload(uri string, handler func(tmpfile string, header http.Header) error) error {
 	uri = applyDateTemplate(uri)
 	if !isValidUrl(uri) {
-		return handler(uri)
+		return handler(uri, http.Header{})
 	}
 
 	log.Printf("Retrieving: %s", uri)
@@ -66,6 +66,12 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 	}
 	tmpfile := tmp.Name()
 
+	lastModified := resp.Header.Get("Last-Modified")
+	if lastModified == "" {
+		lastModified = "unknown"
+	}
+	log.Printf("Remote last modified: %s", lastModified)
+
 	filesize := "unknown size"
 	if resp.ContentLength >= 0 {
 		filesize = humanize.Bytes(uint64(resp.ContentLength))
@@ -87,5 +93,5 @@ func TransientDownload(uri string, handler func(tmpfile string) error) error {
 	if err := tmp.Close(); err != nil {
 		return fmt.Errorf("failed to close temporary file: %w", err)
 	}
-	return handler(tmpfile)
+	return handler(tmpfile, resp.Header)
 }
