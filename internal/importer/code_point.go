@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/rm-hull/company-data-api/internal"
@@ -53,7 +54,7 @@ func NewCodePointImporter(db *sql.DB) *codePointImporter {
 	}
 }
 
-func (importer *codePointImporter) Import(zipPath string) error {
+func (importer *codePointImporter) Import(zipPath string, _ http.Header) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)

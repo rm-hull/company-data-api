@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/rm-hull/company-data-api/internal"
@@ -138,7 +139,7 @@ func NewCompanyDataImporter(db *sql.DB) *companyDataImporter {
 	}
 }
 
-func (importer *companyDataImporter) Import(zipPath string) error {
+func (importer *companyDataImporter) Import(zipPath string, _ http.Header) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)

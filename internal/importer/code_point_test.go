@@ -6,6 +6,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
@@ -131,7 +132,7 @@ func TestImportCodePoint(t *testing.T) {
 	mock.ExpectExec("ANALYZE code_point").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = codePoint.Import(zipPath)
+	err = codePoint.Import(zipPath, http.Header{})
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
@@ -168,7 +169,7 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 	mock.ExpectExec("ANALYZE code_point").
 		WillReturnResult(sqlmock.NewResult(1, 1))
 
-	err = codePoint.Import(zipPath)
+	err = codePoint.Import(zipPath, http.Header{})
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
@@ -190,7 +191,7 @@ func TestImportCodePointPrepareError(t *testing.T) {
 	mock.ExpectPrepare(internal.InsertCodePointSQL).WillReturnError(fmt.Errorf("prepare error"))
 	mock.ExpectRollback()
 
-	err = codePoint.Import(zipPath)
+	err = codePoint.Import(zipPath, http.Header{})
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to prepare statement: prepare error")
 	assert.NoError(t, mock.ExpectationsWereMet())
@@ -214,7 +215,7 @@ func TestImportCodePointExecError(t *testing.T) {
 		WillReturnError(fmt.Errorf("exec error"))
 	mock.ExpectRollback()
 
-	err = codePoint.Import(zipPath)
+	err = codePoint.Import(zipPath, http.Header{})
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to execute individual insert: exec error")
 	assert.NoError(t, mock.ExpectationsWereMet())
