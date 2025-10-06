@@ -139,7 +139,7 @@ func NewCompanyDataImporter(db *sql.DB) *companyDataImporter {
 	}
 }
 
-func (importer *companyDataImporter) Import(zipPath string, header http.Header) error {
+func (importer *companyDataImporter) Import(zipPath string, _ http.Header) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)

@@ -54,7 +54,7 @@ func NewCodePointImporter(db *sql.DB) *codePointImporter {
 	}
 }
 
-func (importer *codePointImporter) Import(zipPath string, header http.Header) error {
+func (importer *codePointImporter) Import(zipPath string, _ http.Header) error {
 	r, err := zip.OpenReader(zipPath)
 	if err != nil {
 		return fmt.Errorf("failed to open zip file: %w", err)
