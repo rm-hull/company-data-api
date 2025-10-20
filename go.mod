@@ -13,7 +13,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
-	github.com/tavsec/gin-healthcheck v1.7.10
+	github.com/tavsec/gin-healthcheck v1.7.11
 	go.eigsys.de/gin-cachecontrol/v2 v2.4.0
 )
 
@@ -83,7 +83,7 @@ require (
 	github.com/prometheus/common v0.66.1 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
-	github.com/redis/go-redis/v9 v9.14.0 // indirect
+	github.com/redis/go-redis/v9 v9.14.1 // indirect
 	github.com/rm-hull/godx v0.0.3
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
