@@ -243,8 +243,8 @@ github.com/rabbitmq/amqp091-go v1.10.0 h1:STpn5XsHlHGcecLmMFCtg7mqq0RnD+zFr4uzuk
 github.com/rabbitmq/amqp091-go v1.10.0/go.mod h1:Hy4jKW5kQART1u+JkDTF9YYOQUHXqMuhrgxOEeS7G4o=
 github.com/redis/go-redis/v9 v9.16.0 h1:OotgqgLSRCmzfqChbQyG1PHC3tLNR89DG4jdOERSEP4=
 github.com/redis/go-redis/v9 v9.16.0/go.mod h1:u410H11HMLoB+TP67dz8rL9s6QW2j76l0//kSOd3370=
-github.com/rm-hull/godx v0.0.3 h1:uxit24T7yEMDSzrKQoqrawW7MmxaWuCsGvuw9nNdnGU=
-github.com/rm-hull/godx v0.0.3/go.mod h1:J5j90oIss1JHkWeg84Egn5YbFOWHKQZsvu27UJbHRAo=
+github.com/rm-hull/godx v0.0.4 h1:LN1sQsS4unseWBUpZ1omFPvzQue10023Z5GA4p0cOtY=
+github.com/rm-hull/godx v0.0.4/go.mod h1:J5j90oIss1JHkWeg84Egn5YbFOWHKQZsvu27UJbHRAo=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/rogpeppe/go-internal v1.8.0/go.mod h1:WmiCO8CzOY8rg0OYDC4/i/2WRWAB6poM+XZ2dLUbcbE=
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
