@@ -3,7 +3,7 @@ module github.com/rm-hull/company-data-api
 go 1.26
 
 require (
-	github.com/Depado/ginprom v1.8.2
+	github.com/Depado/ginprom v1.8.3
 	github.com/aurowora/compress v0.0.0-20230724224640-6512772d482f
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.11.0
