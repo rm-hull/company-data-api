@@ -112,7 +112,8 @@ jobs:
             type=sha
           labels: |
             maintainer=rm-hull
-            org.opencontainers.image.description=REST API for GPS routes
+            org.opencontainers.image.description=API for finding UK companies by easting/northing bounding box
+            org.opencontainers.image.source="https://github.com/map-services/company-data-api"
             org.opencontainers.image.licenses=MIT
 
       - name: Build and push Docker image
