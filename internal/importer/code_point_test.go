@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/rm-hull/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal"
 	"github.com/stretchr/testify/assert"
 )
 

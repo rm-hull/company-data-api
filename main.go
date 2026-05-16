@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/rm-hull/company-data-api/cmd"
+	"github.com/map-services/company-data-api/cmd"
 
 	"github.com/spf13/cobra"
 )

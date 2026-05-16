@@ -1,4 +1,4 @@
-module github.com/rm-hull/company-data-api
+module github.com/map-services/company-data-api
 
 go 1.26
 

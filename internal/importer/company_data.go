@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rm-hull/company-data-api/internal"
-	"github.com/rm-hull/company-data-api/internal/models"
+	"github.com/map-services/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal/models"
 )
 
 func fromCompanyDataCSV(record []string, headers []string) (*models.CompanyData, error) {

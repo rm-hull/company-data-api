@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/rm-hull/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal"
 )
 
 type CodePoint struct {

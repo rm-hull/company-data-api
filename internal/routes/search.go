@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rm-hull/company-data-api/internal"
-	"github.com/rm-hull/company-data-api/internal/models"
-	repo "github.com/rm-hull/company-data-api/internal/repositories"
+	"github.com/map-services/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal/models"
+	repo "github.com/map-services/company-data-api/internal/repositories"
 
 	"github.com/gin-gonic/gin"
 )

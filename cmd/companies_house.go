@@ -3,8 +3,8 @@ package cmd
 import (
 	"log"
 
-	"github.com/rm-hull/company-data-api/internal"
-	"github.com/rm-hull/company-data-api/internal/importer"
+	"github.com/map-services/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal/importer"
 	"github.com/rm-hull/godx"
 )
 
