@@ -14,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/map-services/company-data-api/docs"
 	"github.com/map-services/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal/middleware"
 	"github.com/map-services/company-data-api/pkg/logger"
 	repo "github.com/map-services/company-data-api/internal/repositories"
 	"github.com/map-services/company-data-api/internal/routes"
@@ -65,6 +66,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 
 	r.Use(
 		gin.Recovery(),
+		middleware.RequestLogger(),
 		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
 		prometheus.Instrument(),
 		compress.Compress(),
