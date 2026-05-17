@@ -2,30 +2,40 @@ package middleware
 
 import (
 	"log/slog"
+	"slices"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 // RequestLogger is a middleware that logs details about every incoming request.
-func RequestLogger() gin.HandlerFunc {
+func RequestLogger(logger *slog.Logger, excludedPaths ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		path := c.Request.URL.Path
-		query := c.Request.URL.RawQuery
+		raw := c.Request.URL.RawQuery
 
 		c.Next()
 
-		latency := time.Since(start)
-		status := c.Writer.Status()
+		if slices.Contains(excludedPaths, c.Request.URL.Path) {
+			return
+		}
 
-		slog.Info("Request handled",
-			"status", status,
+		if raw != "" {
+			path = path + "?" + raw
+		}
+
+		end := time.Now()
+		latency := end.Sub(start)
+
+		logger.Info("request",
 			"method", c.Request.Method,
 			"path", path,
-			"query", query,
-			"latency", latency,
-			"client_ip", c.ClientIP(),
+			"status", c.Writer.Status(),
+			"latency_ms", latency.Milliseconds(),
+			"ip", c.ClientIP(),
+			"user_agent", c.Request.UserAgent(),
+			"body_size", c.Writer.Size(),
 		)
 	}
 }

@@ -66,7 +66,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 
 	r.Use(
 		gin.Recovery(),
-		middleware.RequestLogger(),
+		middleware.RequestLogger(slog.Default(), "/healthz", "/metrics"),
 		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
 		prometheus.Instrument(),
 		compress.Compress(),
