@@ -37,3 +37,10 @@ data/codepo_gb.zip
 data/companies_data.db*
 data/BasicCompanyDataAsOneFile-2025-06-01.zip
 test-reports/
+
+# gemini-cli settings
+.gemini/
+gemini-artifacts/
+
+# GitHub App credentials
+gha-creds-*.json
