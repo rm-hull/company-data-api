@@ -2,7 +2,7 @@ package routes
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 	"net/http"
 	"strconv"
@@ -56,7 +56,7 @@ func Search(repo repo.SearchRepository) func(c *gin.Context) {
 		})
 
 		if err != nil {
-			log.Printf("error while fetching company data: %v", err)
+			slog.Error("error while fetching company data", "error", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "An internal server error occurred"})
 			return
 		}
@@ -97,7 +97,7 @@ func GroupByPostcode(repo repo.SearchRepository) func(c *gin.Context) {
 		})
 
 		if err != nil {
-			log.Printf("error while fetching company data: %v", err)
+			slog.Error("error while fetching company data", "error", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "An internal server error occurred"})
 			return
 		}

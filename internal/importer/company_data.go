@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -146,7 +146,7 @@ func (importer *companyDataImporter) Import(zipPath string, _ http.Header) error
 	}
 	defer func() {
 		if err := r.Close(); err != nil {
-			log.Printf("error closing zip file: %v", err)
+			slog.Error("error closing zip file", "error", err)
 		}
 	}()
 
@@ -156,8 +156,8 @@ func (importer *companyDataImporter) Import(zipPath string, _ http.Header) error
 		}
 	}
 
-	log.Printf("Import completed successfully!")
-	log.Printf("Analyzing \"company_data\" table")
+	slog.Info("Import completed successfully!")
+	slog.Info("Analyzing \"company_data\" table")
 	if _, err = importer.db.Exec("ANALYZE company_data"); err != nil {
 		return fmt.Errorf("failed to analyze \"company_data\" table: %w", err)
 	}
@@ -171,7 +171,7 @@ func (importer *companyDataImporter) processCSV(f *zip.File) error {
 	}
 	defer func() {
 		if err := r.Close(); err != nil {
-			log.Printf("error closing embedded zip file: %v", err)
+			slog.Error("error closing embedded zip file", "error", err)
 		}
 	}()
 
@@ -216,7 +216,7 @@ func (importer *companyDataImporter) insertBatch(batch []models.CompanyData, las
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				log.Printf("error rolling back transaction: %v", rbErr)
+				slog.Error("error rolling back transaction", "error", rbErr)
 			}
 		}
 	}()
@@ -227,7 +227,7 @@ func (importer *companyDataImporter) insertBatch(batch []models.CompanyData, las
 	}
 	defer func() {
 		if err := stmt.Close(); err != nil {
-			log.Printf("failed to close statement: %v", err)
+			slog.Error("failed to close statement", "error", err)
 		}
 	}()
 
@@ -242,6 +242,6 @@ func (importer *companyDataImporter) insertBatch(batch []models.CompanyData, las
 		return fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	log.Printf("Inserted %d records...", lastLineNum)
+	slog.Info("Inserted records", "lastLineNum", lastLineNum)
 	return nil
 }

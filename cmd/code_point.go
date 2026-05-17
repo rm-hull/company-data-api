@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"log"
+	"log/slog"
+	"os"
 
 	"github.com/map-services/company-data-api/internal"
 	"github.com/map-services/company-data-api/internal/importer"
@@ -9,23 +10,23 @@ import (
 )
 
 func ImportCodepointZipFile(zipFile string, dbPath string) {
-
-	godx.GitVersion()
-	godx.EnvironmentVars()
-	godx.UserInfo()
+	logger := internal.SetupLogger()
+	godx.Diagnostics(logger)
 
 	db, err := internal.Connect(dbPath)
 	if err != nil {
-		log.Fatalf("failed to initialize database: %v", err)
+		slog.Error("failed to initialize database", "error", err)
+		os.Exit(1)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Printf("error closing database: %v", err)
+			slog.Error("error closing database", "error", err)
 		}
 	}()
 
 	err = internal.TransientDownload(zipFile, importer.NewCodePointImporter(db).Import)
 	if err != nil {
-		log.Fatalf("failed to import code points: %v", err)
+		slog.Error("failed to import code points", "error", err)
+		os.Exit(1)
 	}
 }

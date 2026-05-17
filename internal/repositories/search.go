@@ -3,7 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -40,10 +40,10 @@ func NewSqliteDbRepository(db *sql.DB) (SearchRepository, error) {
 	go func() {
 		lastUpdated, err := getLastUpdated(db)
 		if err != nil {
-			log.Printf("failed to obtain last updated date: %v", err)
+			slog.Error("failed to obtain last updated date", "error", err)
 		}
 		repo.lastUpdated.Store(lastUpdated)
-		log.Printf("Company data last updated: %s", lastUpdated)
+		slog.Info("Company data last updated", "lastUpdated", lastUpdated)
 	}()
 
 	return &repo, nil
@@ -71,7 +71,7 @@ func (repo *SqliteDbRepository) Find(bbox []float64, rowProcessor func(companyDa
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			fmt.Printf("error closing rows: %v\n", err)
+			slog.Error("error closing rows", "error", err)
 		}
 	}()
 

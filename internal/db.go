@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"fmt"
-	"log"
+	"log/slog"
 	"strings"
 )
 
@@ -42,7 +42,7 @@ func Connect(dbPath string) (*sql.DB, error) {
 	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
-	log.Printf("connected to database: %s", dsn)
+	slog.Info("connected to database", "dsn", dsn)
 
 	err = CreateDB(db)
 	if err != nil {

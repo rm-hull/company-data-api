@@ -4,7 +4,7 @@ import (
 	"archive/zip"
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -61,7 +61,7 @@ func (importer *codePointImporter) Import(zipPath string, _ http.Header) error {
 	}
 	defer func() {
 		if err := r.Close(); err != nil {
-			log.Printf("error closing zip file: %v", err)
+			slog.Error("error closing zip file", "error", err)
 		}
 	}()
 
@@ -74,12 +74,12 @@ func (importer *codePointImporter) Import(zipPath string, _ http.Header) error {
 		if err != nil {
 			return fmt.Errorf("failed to process CSV data: %w", err)
 		}
-		log.Printf("Processed file: %s (inserted %d records)", f.Name, recordsInFile)
+		slog.Info("Processed file", "filename", f.Name, "records", recordsInFile)
 		totalRecordsImported += recordsInFile
 	}
 
-	log.Printf("Completed successfully: %d records imported", totalRecordsImported)
-	log.Printf("Analyzing \"code_point\" table")
+	slog.Info("Completed successfully", "totalRecords", totalRecordsImported)
+	slog.Info("Analyzing \"code_point\" table")
 	if _, err = importer.db.Exec("ANALYZE code_point"); err != nil {
 		return fmt.Errorf("failed to analyze \"code_point\" table: %w", err)
 	}
@@ -93,7 +93,7 @@ func (importer *codePointImporter) processCSV(f *zip.File) (int, error) {
 	}
 	defer func() {
 		if err := r.Close(); err != nil {
-			log.Printf("error closing embedded zip file: %v", err)
+			slog.Error("error closing embedded zip file", "error", err)
 		}
 	}()
 
@@ -136,7 +136,7 @@ func (importer *codePointImporter) insertBatch(batch []CodePoint) error {
 	defer func() {
 		if err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
-				log.Printf("error rolling back transaction: %v", rbErr)
+				slog.Error("error rolling back transaction", "error", rbErr)
 			}
 		}
 	}()
@@ -147,7 +147,7 @@ func (importer *codePointImporter) insertBatch(batch []CodePoint) error {
 	}
 	defer func() {
 		if err := stmt.Close(); err != nil {
-			log.Printf("failed to close statement: %v", err)
+			slog.Error("failed to close statement", "error", err)
 		}
 	}()
 

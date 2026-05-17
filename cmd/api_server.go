@@ -2,8 +2,9 @@ package cmd
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Depado/ginprom"
@@ -13,6 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/map-services/company-data-api/docs"
 	"github.com/map-services/company-data-api/internal"
+	"github.com/map-services/company-data-api/internal/middleware"
 	repo "github.com/map-services/company-data-api/internal/repositories"
 	"github.com/map-services/company-data-api/internal/routes"
 	_ "github.com/mattn/go-sqlite3"
@@ -30,24 +32,24 @@ import (
 // @description A fast REST API for querying UK company data by geographic bounding box, built with Go, SQLite, and Gin. It imports official datasets from Companies House and Ordnance Survey CodePoint Open, providing spatial search capabilities for company records.
 // @BasePath /v1/company-data
 func ApiServer(dbPath string, port int, debug bool) {
-
-	godx.GitVersion()
-	godx.EnvironmentVars()
-	godx.UserInfo()
+	logger := internal.SetupLogger()
+	godx.Diagnostics(logger)
 
 	db, err := internal.Connect(dbPath)
 	if err != nil {
-		log.Fatalf("failed to initialize database: %v", err)
+		slog.Error("failed to initialize database", "error", err)
+		os.Exit(1)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			log.Printf("error closing database: %v", err)
+			slog.Error("error closing database", "error", err)
 		}
 	}()
 
 	repo, err := repo.NewSqliteDbRepository(db)
 	if err != nil {
-		log.Fatalf("failed to initialize repository: %v", err)
+		slog.Error("failed to initialize repository", "error", err)
+		os.Exit(1)
 	}
 
 	r := gin.New()
@@ -60,7 +62,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 
 	r.Use(
 		gin.Recovery(),
-		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
+		middleware.RequestLogger(slog.Default(), "/healthz", "/metrics"),
 		prometheus.Instrument(),
 		compress.Compress(),
 		cachecontrol.New(cachecontrol.Config{
@@ -73,7 +75,7 @@ func ApiServer(dbPath string, port int, debug bool) {
 	)
 
 	if debug {
-		log.Println("WARNING: pprof endpoints are enabled and exposed. Do not run with this flag in production.")
+		slog.Warn("pprof endpoints are enabled and exposed. Do not run with this flag in production.")
 		pprof.Register(r)
 	}
 
@@ -81,7 +83,8 @@ func ApiServer(dbPath string, port int, debug bool) {
 		checks.SqlCheck{Sql: db},
 	})
 	if err != nil {
-		log.Fatalf("failed to initialize healthcheck: %v", err)
+		slog.Error("failed to initialize healthcheck", "error", err)
+		os.Exit(1)
 	}
 
 	v1 := r.Group("/v1/company-data")
@@ -90,8 +93,9 @@ func ApiServer(dbPath string, port int, debug bool) {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	addr := fmt.Sprintf(":%d", port)
-	log.Printf("Starting HTTP API Server on port %d...", port)
+	slog.Info("Starting HTTP API Server", "port", port)
 	if err := r.Run(addr); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
+		slog.Error("HTTP API Server failed to start", "port", port, "error", err)
+		os.Exit(1)
 	}
 }
