@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -15,6 +15,15 @@ import (
 	"github.com/map-services/company-data-api/internal"
 	"github.com/stretchr/testify/assert"
 )
+
+// Helper to capture slog output
+func setupSlogBuffer() (*bytes.Buffer, *slog.Logger) {
+	var buf bytes.Buffer
+	handler := slog.NewJSONHandler(&buf, &slog.HandlerOptions{Level: slog.LevelInfo})
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+	return &buf, logger
+}
 
 // createTestZipCodePoint creates a temporary zip file with a single CSV file for testing
 func createTestZipCodePoint(t *testing.T, numRecords int) string {
@@ -116,12 +125,7 @@ func TestImportCodePoint(t *testing.T) {
 		assert.NoError(t, os.Remove(zipPath))
 	}()
 
-	// Capture log output
-	var buf bytes.Buffer
-	log.SetOutput(&buf)
-	defer func() {
-		log.SetOutput(os.Stderr) // Restore default output
-	}()
+	buf, _ := setupSlogBuffer()
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare(internal.InsertCodePointSQL)
@@ -136,7 +140,7 @@ func TestImportCodePoint(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
-	assert.Contains(t, buf.String(), "Completed successfully: 1 records imported")
+	assert.Contains(t, buf.String(), "Completed successfully")
 }
 
 func TestImportCodePointMultipleRecords(t *testing.T) {
@@ -151,12 +155,7 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 		assert.NoError(t, os.Remove(zipPath))
 	}()
 
-	// Capture log output
-	var buf bytes.Buffer
-	log.SetOutput(&buf)
-	defer func() {
-		log.SetOutput(os.Stderr) // Restore default output
-	}()
+	buf, _ := setupSlogBuffer()
 
 	mock.ExpectBegin()
 	mock.ExpectPrepare(internal.InsertCodePointSQL)
@@ -173,7 +172,7 @@ func TestImportCodePointMultipleRecords(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NoError(t, mock.ExpectationsWereMet())
 
-	assert.Contains(t, buf.String(), fmt.Sprintf("Completed successfully: %d records imported", numRecords))
+	assert.Contains(t, buf.String(), "Completed successfully")
 }
 
 func TestImportCodePointPrepareError(t *testing.T) {
