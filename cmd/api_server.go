@@ -15,7 +15,6 @@ import (
 	_ "github.com/map-services/company-data-api/docs"
 	"github.com/map-services/company-data-api/internal"
 	"github.com/map-services/company-data-api/internal/middleware"
-	"github.com/map-services/company-data-api/pkg/logger"
 	repo "github.com/map-services/company-data-api/internal/repositories"
 	"github.com/map-services/company-data-api/internal/routes"
 	_ "github.com/mattn/go-sqlite3"
@@ -33,11 +32,8 @@ import (
 // @description A fast REST API for querying UK company data by geographic bounding box, built with Go, SQLite, and Gin. It imports official datasets from Companies House and Ordnance Survey CodePoint Open, providing spatial search capabilities for company records.
 // @BasePath /v1/company-data
 func ApiServer(dbPath string, port int, debug bool) {
-	logger.SetupLogger()
-
-	godx.GitVersion()
-	godx.EnvironmentVars()
-	godx.UserInfo()
+	logger := internal.SetupLogger()
+	godx.Diagnostics(logger)
 
 	db, err := internal.Connect(dbPath)
 	if err != nil {
@@ -67,7 +63,6 @@ func ApiServer(dbPath string, port int, debug bool) {
 	r.Use(
 		gin.Recovery(),
 		middleware.RequestLogger(slog.Default(), "/healthz", "/metrics"),
-		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
 		prometheus.Instrument(),
 		compress.Compress(),
 		cachecontrol.New(cachecontrol.Config{

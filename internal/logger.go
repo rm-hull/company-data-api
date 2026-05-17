@@ -1,4 +1,4 @@
-package logger
+package internal
 
 import (
 	"log/slog"
@@ -6,10 +6,11 @@ import (
 )
 
 // SetupLogger configures the global logger to use a JSON handler.
-func SetupLogger() {
+func SetupLogger() *slog.Logger {
 	handler := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	})
 	logger := slog.New(handler)
 	slog.SetDefault(logger)
+	return logger
 }

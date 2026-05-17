@@ -6,16 +6,12 @@ import (
 
 	"github.com/map-services/company-data-api/internal"
 	"github.com/map-services/company-data-api/internal/importer"
-	"github.com/map-services/company-data-api/pkg/logger"
 	"github.com/rm-hull/godx"
 )
 
 func ImportCodepointZipFile(zipFile string, dbPath string) {
-	logger.SetupLogger()
-
-	godx.GitVersion()
-	godx.EnvironmentVars()
-	godx.UserInfo()
+	logger := internal.SetupLogger()
+	godx.Diagnostics(logger)
 
 	db, err := internal.Connect(dbPath)
 	if err != nil {
