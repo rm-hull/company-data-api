@@ -14,7 +14,7 @@ require (
 	github.com/swaggo/gin-swagger v1.6.1
 	github.com/swaggo/swag v1.16.6
 	github.com/tavsec/gin-healthcheck v1.7.15
-	go.eigsys.de/gin-cachecontrol/v2 v2.5.0
+	go.eigsys.de/gin-cachecontrol/v2 v2.6.0
 )
 
 require (
